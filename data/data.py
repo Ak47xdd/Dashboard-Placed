@@ -9,7 +9,7 @@ from constants import USE_CSV, REFRESH_SECONDS, CSV_FILE, SHEET_NAME, WORKSHEET_
 def load_data():
     if USE_CSV:
         # Load from local CSV file for testing
-        df = pd.read_csv(CSV_FILE)
+        df = pd.read_csv(f"data/{CSV_FILE}")
     else:
         # Load from Google Sheets
         client = get_clients()
@@ -19,14 +19,15 @@ def load_data():
     return df
 
 def process_data(df):
-    """Process and clean the dataframe"""
-    # Convert hours spent to numeric
-    df['Hours spent'] = pd.to_numeric(df['Hours spent'], errors='coerce')
+    """Process and clean the new classifications dataframe"""
+    # Set student_id as unique index
+    df['student_id'] = df['student_id'].astype(int)
+    df = df.set_index('student_id')
     
-    # Parse date of enrollment
-    df['Date of Enrollment'] = pd.to_datetime(df['Date of Enrollment'], format='%d/%m/%Y', errors='coerce')
-    
-    # Parse timestamp
-    df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
+    # Convert all scores to numeric
+    score_columns = ['quant_score', 'logic_score', 'verbal_score', 'final_score']
+    for col in score_columns:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
     
     return df
+
