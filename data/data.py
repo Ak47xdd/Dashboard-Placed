@@ -1,33 +1,34 @@
-import streamlit as st
-import gspread
 import pandas as pd
-from google.oauth2 import service_account
-from client import get_clients
-from constants import USE_CSV, REFRESH_SECONDS, CSV_FILE, SHEET_NAME, WORKSHEET_INDEX
+import os
+from datetime import datetime, timezone
 
-@st.cache_data(ttl=REFRESH_SECONDS)
 def load_data():
-    if USE_CSV:
-        # Load from local CSV file for testing
-        df = pd.read_csv(f"data/{CSV_FILE}")
-    else:
-        # Load from Google Sheets
-        client = get_clients()
-        sheet = client.open(SHEET_NAME).get_worksheet(WORKSHEET_INDEX)
-        records = sheet.get_all_records()
-        df = pd.DataFrame(records)
-    return df
+    csv_path = "data/STUDENTS - Sheet1.csv"
+    if os.path.exists(csv_path):
+        return pd.read_csv(csv_path)
+    return pd.DataFrame()
+
+def add_student_entry(**kwargs):
+    CSV_PATH = "data/STUDENTS - Sheet1.csv"
+    data_dict = kwargs.get('data_dict', {})
+    
+    # CRITICAL: Honor the student_id from API - NEVER OVERRIDE
+    student_id = data_dict.get('student_id')
+    
+    data_dict.setdefault("created_at", datetime.now(timezone.utc).isoformat())
+    
+    # Load + append + save
+    df_existing = pd.read_csv(CSV_PATH) if os.path.exists(CSV_PATH) else pd.DataFrame()
+    new_row = pd.DataFrame([data_dict])
+    df_new = pd.concat([df_existing, new_row], ignore_index=True)
+    df_new.to_csv(CSV_PATH, index=False)
+    
+    print(f"SAVED Student ID {student_id}")
+    return student_id
 
 def process_data(df):
-    """Process and clean the new classifications dataframe"""
-    # Set student_id as unique index
-    df['student_id'] = df['student_id'].astype(int)
-    df = df.set_index('student_id')
-    
-    # Convert all scores to numeric
-    score_columns = ['quant_score', 'logic_score', 'verbal_score', 'final_score']
-    for col in score_columns:
-        df[col] = pd.to_numeric(df[col], errors='coerce')
-    
+    numeric_cols = ['quant_score', 'logic_score', 'verbal_score', 'final_score', 'student_id']
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
     return df
-
