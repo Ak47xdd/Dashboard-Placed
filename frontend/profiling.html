@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLACED - CRP Diagnostic Profiling</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="profiling.css">
+</head>
+<body class="dashboard-body">
+    <div class="title-container">
+        <h1>PLACED CRP Diagnostic Profiling</h1>
+        <p>Complete all sections to get your personalized learning path</p>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span id="progress-text">0%</span>
+        </div>
+    </div>
+
+    <form id="profiling-form" class="form-container">
+        <!-- Section 0: Student Identification -->
+        <div class="section">
+            <h2>Student Identification</h2>
+            <div class="question">
+                <label>Full Name *</label>
+                <input type="text" name="section0.student_name" class="glass-input" required>
+            </div>
+            <div class="question">
+                <label>Mobile Number (10 digits) *</label>                
+                <input type="tel" name="section0.mobile_number" class="glass-input" pattern="[0-9]{10}" inputmode="numeric" maxlength="10" required>
+            </div>
+            <div class="question">
+                <label>Email ID (Optional)</label>
+                <input type="email" name="section0.email_id" class="glass-input">
+            </div>
+            <div class="question">
+                <label>College Name *</label>
+                <input type="text" name="section0.college_name" class="glass-input" required>
+            </div>
+            <div class="question">
+                <label>Department / Course *</label>
+                <input type="text" name="section0.department" class="glass-input" required>
+            </div>
+        </div>
+
+        <!-- Section 1: Basic Information -->
+        <div class="section">
+            <h2>Basic Information</h2>
+            <div class="question">
+                <label>What is your course type?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section1.course_type" value="BBA"> BBA</label>
+                    <label class="option-card"><input type="radio" name="section1.course_type" value="BCom"> BCom</label>
+                    <label class="option-card"><input type="radio" name="section1.course_type" value="BSc"> BSc</label>
+                    <label class="option-card"><input type="radio" name="section1.course_type" value="BTech"> BTech</label>
+                    <label class="option-card"><input type="radio" name="section1.course_type" value="BA"> BA</label>
+                    <label class="option-card"><input type="radio" name="section1.course_type" value="Other"> Other</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>What year are you currently in?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section1.year" value="1"> 1</label>
+                    <label class="option-card"><input type="radio" name="section1.year" value="2"> 2</label>
+                    <label class="option-card"><input type="radio" name="section1.year" value="3"> 3</label>
+                    <label class="option-card"><input type="radio" name="section1.year" value="4"> 4</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Medium of education till +2?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section1.medium" value="English"> English</label>
+                    <label class="option-card"><input type="radio" name="section1.medium" value="Malayalam"> Malayalam</label>
+                    <label class="option-card"><input type="radio" name="section1.medium" value="Tamil"> Tamil</label>
+                    <label class="option-card"><input type="radio" name="section1.medium" value="Other"> Other</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Previously prepared for aptitude exams?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section1.have_prep_test" value="No"> No</label>
+                    <label class="option-card"><input type="radio" name="section1.have_prep_test" value="Yes - Basic"> Yes - Basic</label>
+                    <label class="option-card"><input type="radio" name="section1.have_prep_test" value="Yes - Advanced"> Yes - Advanced</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Primary career goal?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section1.career_goal" value="Government Exams (SSC/Banking)"> Government Exams</label>
+                    <label class="option-card"><input type="radio" name="section1.career_goal" value="CAT/MBA"> CAT/MBA</label>
+                    <label class="option-card"><input type="radio" name="section1.career_goal" value="Campus Placements"> Campus Placements</label>
+                    <label class="option-card"><input type="radio" name="section1.career_goal" value="Higher Studies"> Higher Studies</label>
+                    <label class="option-card"><input type="radio" name="section1.career_goal" value="Not Decided"> Not Decided</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Aptitude MCQs (0-3 indices) -->
+        <div class="section">
+            <h2>Aptitude Test</h2>
+            <!-- Quantitative -->
+            <h3>Quantitative Aptitude</h3>
+            <div class="question">
+                <label>Q1: If 12 men complete a work in 8 days, how many men for 6 days?</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="quant1" value="1"> 14</label>
+                    <label class="option-card"><input type="radio" name="quant1" value="2"> 16</label>
+                    <label class="option-card"><input type="radio" name="quant1" value="3"> 18</label>
+                    <label class="option-card"><input type="radio" name="quant1" value="4"> 20</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Q2: Train 150m crosses pole in 10s. Speed = ?</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="quant2" value="1"> 36 km/h</label>
+                    <label class="option-card"><input type="radio" name="quant2" value="2"> 54 km/h</label>
+                    <label class="option-card"><input type="radio" name="quant2" value="3"> 72 km/h</label>
+                    <label class="option-card"><input type="radio" name="quant2" value="4"> 90 km/h</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Q3: SI on ₹5000 @10% for 2yrs = ?</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="quant3" value="1"> 500</label>
+                    <label class="option-card"><input type="radio" name="quant3" value="2"> 800</label>
+                    <label class="option-card"><input type="radio" name="quant3" value="3"> 1000</label>
+                    <label class="option-card"><input type="radio" name="quant3" value="4"> 1200</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Q4: Next: 2,6,12,20,?</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="quant4" value="1"> 28</label>
+                    <label class="option-card"><input type="radio" name="quant4" value="2"> 30</label>
+                    <label class="option-card"><input type="radio" name="quant4" value="3"> 32</label>
+                    <label class="option-card"><input type="radio" name="quant4" value="4"> 36</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Q5: Boys:girls 3:2, total 50. Girls = ?</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="quant5" value="1"> 20</label>
+                    <label class="option-card"><input type="radio" name="quant5" value="2"> 25</label>
+                    <label class="option-card"><input type="radio" name="quant5" value="3"> 30</label>
+                    <label class="option-card"><input type="radio" name="quant5" value="4"> 35</label>
+                </div>
+            </div>
+
+            <!-- Logical Reasoning -->
+            <h3>Logical Reasoning</h3>
+            <div class="question">
+                <label>Q1: Odd one out: Apple, Mango, Banana, Carrot</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="logic1" value="1"> Apple</label>
+                    <label class="option-card"><input type="radio" name="logic1" value="2"> Mango</label>
+                    <label class="option-card"><input type="radio" name="logic1" value="3"> Banana</label>
+                    <label class="option-card"><input type="radio" name="logic1" value="4"> Carrot</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Q2: CAT → DBU, DOG → ?</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="logic2" value="1"> EPH</label>
+                    <label class="option-card"><input type="radio" name="logic2" value="2"> EPG</label>
+                    <label class="option-card"><input type="radio" name="logic2" value="3"> EPF</label>
+                    <label class="option-card"><input type="radio" name="logic2" value="4"> EPH</label>
+                </div>
+            </div>
+            <!-- Continue for logic3-5, verbal1-5 with similar pattern (abbreviated for space, full in actual) -->
+<div class="question">
+                <label>Q3: All pens are books. Some books are tables. Conclusion?</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="logic3" value="1"> Some pens are tables</label>
+                    <label class="option-card"><input type="radio" name="logic3" value="2"> No pen is table</label>
+                    <label class="option-card"><input type="radio" name="logic3" value="3"> Cannot be determined</label>
+                    <label class="option-card"><input type="radio" name="logic3" value="4"> All tables are pens</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Q4: Number series: 3, 9, 27, ?</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="logic4" value="1"> 54</label>
+                    <label class="option-card"><input type="radio" name="logic4" value="2"> 72</label>
+                    <label class="option-card"><input type="radio" name="logic4" value="3"> 81</label>
+                    <label class="option-card"><input type="radio" name="logic4" value="4"> 90</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Q5: If North becomes East, East becomes South, West becomes?</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="logic5" value="1"> North</label>
+                    <label class="option-card"><input type="radio" name="logic5" value="2"> South</label>
+                    <label class="option-card"><input type="radio" name="logic5" value="3"> East</label>
+                    <label class="option-card"><input type="radio" name="logic5" value="4"> West</label>
+                </div>
+            </div>
+
+            <!-- Verbal Ability -->
+            <h3>Verbal Ability</h3>
+            <div class="question">
+                <label>Q1: Synonym of "ABUNDANT"</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="verbal1" value="1"> Scarce</label>
+                    <label class="option-card"><input type="radio" name="verbal1" value="2"> Plenty</label>
+                    <label class="option-card"><input type="radio" name="verbal1" value="3"> Rare</label>
+                    <label class="option-card"><input type="radio" name="verbal1" value="4"> Limited</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Q2: He ___ to the market yesterday</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="verbal2" value="1"> go</label>
+                    <label class="option-card"><input type="radio" name="verbal2" value="2"> went</label>
+                    <label class="option-card"><input type="radio" name="verbal2" value="3"> goes</label>
+                    <label class="option-card"><input type="radio" name="verbal2" value="4"> going</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Q3: Identify the error: "She don't like coffee"</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="verbal3" value="1"> She</label>
+                    <label class="option-card"><input type="radio" name="verbal3" value="2"> don't</label>
+                    <label class="option-card"><input type="radio" name="verbal3" value="3"> like</label>
+                    <label class="option-card"><input type="radio" name="verbal3" value="4"> coffee</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Q4: What is emphasized in: "Success is not final, failure is not fatal…"</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="verbal4" value="1"> Luck</label>
+                    <label class="option-card"><input type="radio" name="verbal4" value="2"> Courage</label>
+                    <label class="option-card"><input type="radio" name="verbal4" value="3"> Failure</label>
+                    <label class="option-card"><input type="radio" name="verbal4" value="4"> Talent</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Q5: He was very ___ in solving problems</label>
+                <div class="options-grid mcq-grid">
+                    <label class="option-card"><input type="radio" name="verbal5" value="1"> efficient</label>
+                    <label class="option-card"><input type="radio" name="verbal5" value="2"> efficiency</label>
+                    <label class="option-card"><input type="radio" name="verbal5" value="3"> efficiently</label>
+                    <label class="option-card"><input type="radio" name="verbal5" value="4"> inefficiency</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Behavioural (1-5 scale) -->
+        <div class="section">
+            <h2>Behavioural Index (1=Strongly Disagree, 5=Strongly Agree)</h2>
+            <div class="question">
+                <label>I can focus for at least 1 hour</label>
+                <div class="options-grid scale-grid">
+                    <label class="option-card"><input type="radio" name="section3.behave_Q1" value="1"> 1</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q1" value="2"> 2</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q1" value="3"> 3</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q1" value="4"> 4</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q1" value="5"> 5</label>
+                </div>
+            </div>
+            <!-- Similar for behave_Q2-Q5 -->
+            <div class="question">
+                <label>I practice consistently every day</label>
+                <div class="options-grid scale-grid">
+                    <label class="option-card"><input type="radio" name="section3.behave_Q2" value="1"> 1</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q2" value="2"> 2</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q2" value="3"> 3</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q2" value="4"> 4</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q2" value="5"> 5</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>I revise what I study regularly</label>
+                <div class="options-grid scale-grid">
+                    <label class="option-card"><input type="radio" name="section3.behave_Q3" value="1"> 1</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q3" value="2"> 2</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q3" value="3"> 3</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q3" value="4"> 4</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q3" value="5"> 5</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>I attempt tests even if I feel unprepared</label>
+                <div class="options-grid scale-grid">
+                    <label class="option-card"><input type="radio" name="section3.behave_Q4" value="1"> 1</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q4" value="2"> 2</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q4" value="3"> 3</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q4" value="4"> 4</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q4" value="5"> 5</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>I analyze my mistakes after tests</label>
+                <div class="options-grid scale-grid">
+                    <label class="option-card"><input type="radio" name="section3.behave_Q5" value="1"> 1</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q5" value="2"> 2</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q5" value="3"> 3</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q5" value="4"> 4</label>
+                    <label class="option-card"><input type="radio" name="section3.behave_Q5" value="5"> 5</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Learning Response -->
+        <div class="section">
+            <h2>Learning Response</h2>
+            <div class="question">
+                <label>When you don't understand a topic, what do you do?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section4.learn_Q1" value="Wait for teacher"> Wait for teacher</label>
+                    <label class="option-card"><input type="radio" name="section4.learn_Q1" value="Search online"> Search online</label>
+                    <label class="option-card"><input type="radio" name="section4.learn_Q1" value="Ask friends"> Ask friends</label>
+                    <label class="option-card"><input type="radio" name="section4.learn_Q1" value="Skip"> Skip</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>What helps you learn best?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section4.learn_Q2" value="Practice questions"> Practice questions</label>
+                    <label class="option-card"><input type="radio" name="section4.learn_Q2" value="Concept explanation"> Concept explanation</label>
+                    <label class="option-card"><input type="radio" name="section4.learn_Q2" value="Shortcuts"> Shortcuts</label>
+                    <label class="option-card"><input type="radio" name="section4.learn_Q2" value="Group discussion"> Group discussion</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Preferred learning pace</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section4.learn_Q3" value="Slow"> Slow</label>
+                    <label class="option-card"><input type="radio" name="section4.learn_Q3" value="Balanced"> Balanced</label>
+                    <label class="option-card"><input type="radio" name="section4.learn_Q3" value="Fast"> Fast</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>When a problem is difficult, you:</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section4.learn_Q4" value="Keep trying"> Keep trying</label>
+                    <label class="option-card"><input type="radio" name="section4.learn_Q4" value="Try another method"> Try another method</label>
+                    <label class="option-card"><input type="radio" name="section4.learn_Q4" value="Skip"> Skip</label>
+                    <label class="option-card"><input type="radio" name="section4.learn_Q4" value="Wait for solution"> Wait for solution</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Instructional Fit -->
+        <div class="section">
+            <h2>Instructional Fit</h2>
+            <div class="question">
+                <label>What helps you understand faster?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section5.fit_Q1" value="Concept explanation"> Concept explanation</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q1" value="Balanced"> Balanced</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q1" value="Practice"> Practice</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q1" value="Shortcuts"> Shortcuts</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Level of explanation you need</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section5.fit_Q2" value="High"> High</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q2" value="Medium"> Medium</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q2" value="Low"> Low</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q2" value="None"> None</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Preferred class interaction</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section5.fit_Q3" value="High"> High</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q3" value="Medium"> Medium</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q3" value="Low"> Low</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q3" value="None"> None</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>How many questions can you solve continuously?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section5.fit_Q4" value="<10"><10</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q4" value="10-20">10-20</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q4" value="20-40">20-40</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q4" value="40+">40+</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Feedback preference</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section5.fit_Q5" value="Immediate"> Immediate</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q5" value="Delayed"> Delayed</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q5" value="Answers only"> Answers only</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q5" value="I don't check"> I don't check</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Adaptability to fast-paced classes</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section5.fit_Q6" value="High"> High</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q6" value="Medium"> Medium</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q6" value="Low"> Low</label>
+                    <label class="option-card"><input type="radio" name="section5.fit_Q6" value="Very Low"> Very Low</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5A: Content Delivery Preference -->
+        <div class="section">
+            <h2>Content Delivery Preference (5A)</h2>
+            <div class="question">
+                <label>Which format helps you understand concepts faster?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section5a.content_Q1" value="Visual (diagrams/videos)"> Visual (diagrams/videos)</label>
+                    <label class="option-card"><input type="radio" name="section5a.content_Q1" value="Auditory (listening)"> Auditory (listening)</label>
+                    <label class="option-card"><input type="radio" name="section5a.content_Q1" value="Reading/Writing"> Reading/Writing</label>
+                    <label class="option-card"><input type="radio" name="section5a.content_Q1" value="Practice-based"> Practice-based</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>When revising, what do you prefer?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section5a.content_Q2" value="Watching"> Watching</label>
+                    <label class="option-card"><input type="radio" name="section5a.content_Q2" value="Listening"> Listening</label>
+                    <label class="option-card"><input type="radio" name="section5a.content_Q2" value="Reading"> Reading</label>
+                    <label class="option-card"><input type="radio" name="section5a.content_Q2" value="Solving"> Solving</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>You remember better when:</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section5a.content_Q3" value="I see it"> I see it</label>
+                    <label class="option-card"><input type="radio" name="section5a.content_Q3" value="I hear it"> I hear it</label>
+                    <label class="option-card"><input type="radio" name="section5a.content_Q3" value="I write it"> I write it</label>
+                    <label class="option-card"><input type="radio" name="section5a.content_Q3" value="I solve it"> I solve it</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5B: Engagement Type -->
+        <div class="section">
+            <h2>Engagement Type (5B)</h2>
+            <div class="question">
+                <label>In a class, you learn best when:</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q1" value="Clear explanation (Academic)"> Clear explanation (Academic)</label>
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q1" value="Discussion & interaction (Interactive)"> Discussion & interaction (Interactive)</label>
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q1" value="Tests & rankings (Competitive)"> Tests & rankings (Competitive)</label>
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q1" value="Activities & tasks (Activity-based)"> Activities & tasks (Activity-based)</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>What keeps you most engaged?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q2" value="Understanding concepts"> Understanding concepts</label>
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q2" value="Asking/answering"> Asking/answering</label>
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q2" value="Competing"> Competing</label>
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q2" value="Doing tasks"> Doing tasks</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>What pushes you to perform better?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q3" value="Structured teaching"> Structured teaching</label>
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q3" value="Participation"> Participation</label>
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q3" value="Competition"> Competition</label>
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q3" value="Practical application"> Practical application</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>If a class feels boring, what improves it?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q4" value="Better explanation"> Better explanation</label>
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q4" value="More interaction"> More interaction</label>
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q4" value="Add competition"> Add competition</label>
+                    <label class="option-card"><input type="radio" name="section5b.engage_Q4" value="Add activities"> Add activities</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: Commitment -->
+        <div class="section">
+            <h2>Commitment</h2>
+            <div class="question">
+                <label>How many hours per week can you realistically dedicate?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section6.commit_Q1" value="<3"><3</label>
+                    <label class="option-card"><input type="radio" name="section6.commit_Q1" value="3-5">3-5</label>
+                    <label class="option-card"><input type="radio" name="section6.commit_Q1" value="5-10">5-10</label>
+                    <label class="option-card"><input type="radio" name="section6.commit_Q1" value="10+">10+</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>What has stopped you from preparing seriously so far?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section6.commit_Q2" value="Time"> Time</label>
+                    <label class="option-card"><input type="radio" name="section6.commit_Q2" value="Guidance"> Guidance</label>
+                    <label class="option-card"><input type="radio" name="section6.commit_Q2" value="Motivation"> Motivation</label>
+                    <label class="option-card"><input type="radio" name="section6.commit_Q2" value="Interest"> Interest</label>
+                </div>
+            </div>
+            <div class="question">
+                <label>Will you follow a strict study plan if provided?</label>
+                <div class="options-grid">
+                    <label class="option-card"><input type="radio" name="section6.commit_Q3" value="Yes"> Yes</label>
+                    <label class="option-card"><input type="radio" name="section6.commit_Q3" value="No"> No</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="submit-section">
+            <button type="submit" class="submit-btn">Submit Profile</button>
+        </div>
+    </form>
+
+    <script src="profiling.js"></script>
+</body>
+</html>
