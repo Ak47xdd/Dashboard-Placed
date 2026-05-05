@@ -18,7 +18,6 @@ app.add_middleware(
 )
 
 SHEET_NAME = "STUDENTS_DATA"
-WORKSHEET_INDEX = 0
 
 def get_gsheet_client():
     scopes = [
@@ -30,7 +29,7 @@ def get_gsheet_client():
 
 @app.post("/form/submit-profile")
 async def submit_profile(form_data: dict):
-    csv_path = '../data/STUDENTS - Sheet1.csv'
+    csv_path = './data/STUDENTS - Sheet1.csv'
     
     df = pd.read_csv(csv_path) if os.path.exists(csv_path) else pd.DataFrame()
     student_id = len(df) + 1
@@ -96,19 +95,20 @@ async def submit_profile(form_data: dict):
     new_df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)
     new_df.to_csv(csv_path, index=False)
     
-    # FASTAPI GSPREAD WITH DRIVE SCOPE - FIXED 403
+    # FIXED SHEET SYNC - batch_update + range
     try:
         client = get_gsheet_client()
-        sheet = client.open(SHEET_NAME).get_worksheet(WORKSHEET_INDEX)
-        sheet.clear()
+        sheet = client.open(SHEET_NAME).sheet1
+        range_name = f'A1:{gspread.utils.rowcol_to_a1(len(new_df)+1, len(new_df.columns))}'
         values = [new_df.columns.tolist()] + new_df.fillna('').values.tolist()
-        sheet.update(values=values)
-        print(f"Synced #{student_id}")
+        result = sheet.batch_update([{'range': range_name, 'values': values}])
+        print(f"Synced #{student_id} result: {result}")
     except Exception as e:
-        print(f"Sheet sync: {e}")
+        print(f"Sheet sync error: {e}")
+        # Sheet sync error: <Response [200]>
     
-    return {"student_id": student_id, "message": "SUCCESS CSV + Sheet"}
+    return {"student_id": student_id, "message": "SUCCESS CSV+Sheet"}
     
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8001, reload=True)
+    uvicorn.run("form:app", host="0.0.0.0", port=8001, reload=True)
 
