@@ -4,6 +4,8 @@ import plotly.express as px
 from constants import REFRESH_SECONDS
 from datetime import datetime
 
+
+
 def filter_data(df):
     # Initialize session state for filters
     init_session_state()
@@ -139,8 +141,8 @@ def filter_data(df):
     avg_logic = filtered_df['logic_score'].mean() if 'logic_score' in filtered_df.columns else 0
     avg_verbal = filtered_df['verbal_score'].mean() if 'verbal_score' in filtered_df.columns else 0
     avg_final = filtered_df['final_score'].mean() if 'final_score' in filtered_df.columns else 0
-    top_final_90 = len(filtered_df[filtered_df['final_score'] >= 90]) if 'final_score' in filtered_df.columns else 0
-    top_final = len(filtered_df[filtered_df['final_score'] >= 85]) if 'final_score' in filtered_df.columns else 0
+    top_final_90 = len(filtered_df[filtered_df['final_score'] >= 75]) if 'final_score' in filtered_df.columns else 0
+    top_final = len(filtered_df[filtered_df['final_score'] >= 45]) if 'final_score' in filtered_df.columns else 0
     top_score = filtered_df['final_score'].max() if 'final_score' in filtered_df.columns else 0
 
     col1, col2, col3, col4 = st.columns(4)
@@ -151,8 +153,8 @@ def filter_data(df):
     
     col5, col6, col7, col8 = st.columns(4)
     col5.metric("🏆 Avg Final Score", f"{avg_final:.1f}")
-    col6.metric("⭐ Top Final (90+)", top_final_90)
-    col7.metric("👑 Top Final (85+)", top_final)
+    col6.metric("⭐ Tier A (75+)", top_final_90)
+    col7.metric("👑 Tier B (45+)", top_final)
     col8.metric("🥇 #1 Performer", f"{top_score:.1f}")
 
     st.markdown("---")
@@ -169,7 +171,7 @@ def filter_data(df):
                              color_continuous_scale='Viridis')
         fig_college.update_traces(hovertemplate='%{y}: <b>%{x}</b><extra></extra>')
         fig_college.update_layout(showlegend=False, hovermode='y unified')
-        st.plotly_chart(fig_college, use_container_width=True)
+        st.plotly_chart(fig_college, width="stretch")
     
     with row1_col2:
         dept_counts = filtered_df['department'].value_counts().head(10).reset_index()
@@ -180,35 +182,39 @@ def filter_data(df):
                           color_continuous_scale='Plasma')
         fig_dept.update_traces(hovertemplate='%{y}: <b>%{x}</b><extra></extra>')
         fig_dept.update_layout(showlegend=False, hovermode='y unified')
-        st.plotly_chart(fig_dept, use_container_width=True)
+        st.plotly_chart(fig_dept, width="stretch")
 
     row2_col1, row2_col2 = st.columns(2)
     
     with row2_col1:
         avg_scores = pd.DataFrame({
-            'Score Type': ['Quant', 'Logic', 'Verbal', 'Final'],
-            'Average': [avg_quant, avg_logic, avg_verbal, avg_final]
+            'Score Type': ['Quant', 'Logic', 'Verbal'],
+            'Average': [avg_quant, avg_logic, avg_verbal]
         })
         fig_avg = px.bar(avg_scores, x='Score Type', y='Average',
                         title="Average Scores Comparison",
                         color='Average', color_continuous_scale='Viridis')
         fig_avg.update_traces(hovertemplate='%{x}: <b>%{y:.1f}</b><extra></extra>')
         fig_avg.update_layout(showlegend=False, hovermode='x unified')
-        st.plotly_chart(fig_avg, use_container_width=True)
+        st.plotly_chart(fig_avg, width="stretch")
     
     with row2_col2:
-        year_avg = filtered_df.groupby('year')['final_score'].mean().reset_index()
-        year_avg['year'] = year_avg['year'].astype(str)
-        fig_year = px.bar(year_avg, x='year', y='final_score',
+        if 'final_score' in filtered_df.columns and 'year' in filtered_df.columns and not filtered_df.empty:
+            year_avg = filtered_df.groupby('year')['final_score'].mean().reset_index()
+            year_avg['year'] = year_avg['year'].astype(str)
+            fig_year = px.bar(year_avg, x='year', y='final_score',
                           title="Average Final Score by Year",
                           color='final_score', color_continuous_scale='Viridis')
+        else:
+            st.warning("📊 No final_score or year data available for year chart")
+            fig_year = px.bar(title="Average Final Score by Year (No Data)")
         fig_year.update_traces(hovertemplate='%{x}: <b>%{y:.1f}</b><extra></extra>')
         fig_year.update_layout(showlegend=False, hovermode='x unified')
-        st.plotly_chart(fig_year, use_container_width=True)
+        st.plotly_chart(fig_year, width="stretch")
 
     st.markdown("### 🏆 Top 10 Performers (Final Score)")
     top_students = filtered_df.nlargest(10, 'final_score')[['quant_score', 'logic_score', 'verbal_score', 'final_score']]
-    st.dataframe(top_students, use_container_width=True)
+    st.dataframe(top_students, width="stretch")
 
     st.markdown("---")
 
@@ -243,7 +249,7 @@ def filter_data(df):
             st.warning("Student ID not found or no student_id column")
     else:
         with st.expander("View All Filtered Data", expanded=False):
-            st.dataframe(filtered_df.reset_index(), use_container_width=True)
+            st.dataframe(filtered_df.reset_index(), width="stretch")
     
     st.caption(f"💡 Auto-refreshes every {REFRESH_SECONDS}s | Student ID is unique identifier")
 
