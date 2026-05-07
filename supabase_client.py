@@ -111,12 +111,32 @@ def get_supabase() -> Any:
     This avoids the external `supabase` Python library so the app works on
     Python 3.14.
 
-    Credentials are expected from constants.py as SUPABASE_URL and SUPABASE_KEY.
+    Credentials are loaded from environment variables.
+
+    Supports optional `.env` loading via `python-dotenv` (if installed).
     """
-    from constants import SUPABASE_URL, SUPABASE_KEY
+
+    import os
+
+    # Optional `.env` support.
+    # We intentionally do not require python-dotenv.
+    # If installed, load it; otherwise rely on real environment variables.
+    try:
+        from dotenv import load_dotenv  # type: ignore
+
+        load_dotenv()
+    except Exception:
+        pass
+
+
+    SUPABASE_URL = os.getenv("SUPABASE_URL")
+    SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
     if not SUPABASE_URL or not SUPABASE_KEY:
-        raise ValueError("SUPABASE_URL and SUPABASE_KEY must be set in constants.py")
+        raise ValueError(
+            "SUPABASE_URL and SUPABASE_KEY must be set as environment variables"
+        )
+
 
     # The Supabase URL can be like: https://<ref>.supabase.co
     # PostgREST base path is /rest/v1
