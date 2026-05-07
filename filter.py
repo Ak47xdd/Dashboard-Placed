@@ -5,14 +5,72 @@ from constants import REFRESH_SECONDS
 from datetime import datetime
 
 
+# Unified canonical mapping used by filters + charts
+# wrong/spelling-variant(lowercase) -> canonical college name(Display name)
+COLLEGE_VARIANT_CANONICAL_MAP = {
+    "christ collage": "Christ College Vizhinjam",
+    "amrita": "Amrita Vishwa Vidyapeetham Mysuru",
+}
+
+# Backwards-compatible alias (in case other modules import it)
+COLLEGE_CANONICAL = COLLEGE_VARIANT_CANONICAL_MAP
+
+
+def _normalize_college_name(series):
+    """Normalize college_name using the unified COLLEGE_VARIANT_CANONICAL_MAP.
+
+    This function is intended to be the single source of truth for spelling/typo variants.
+    """
+    if series is None:
+        return series
+
+    s = series.fillna("").astype(str).str.strip()
+    if not COLLEGE_VARIANT_CANONICAL_MAP:
+        return s
+
+    s_lower = s.astype(str).str.strip().str.lower()
+    for wrong_lower, canonical in {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.items()}.items():
+        mask = s_lower.eq(wrong_lower)
+        if mask.any():
+            s.loc[mask] = canonical
+
+    return s
+
+
 
 def filter_data(df):
-    # Initialize session state for filters
     init_session_state()
-    
+
     filtered_df = df.copy()
-    
+
+    # Normalize known college spelling variants so filters/charts treat them as the same college
+    if 'college_name' in filtered_df.columns:
+        # Use unified canonical mapping for both filters + charts
+        filtered_df['college_name'] = (
+            filtered_df['college_name']
+            .fillna('')
+            .astype(str)
+            .str.strip()
+        )
+
+        # Case-insensitive normalization via unified map
+        # (also handles different spellings for the same college)
+        cn = filtered_df['college_name']
+        cn_lower = cn.astype(str).str.strip().str.lower()
+
+        # Build mapping with lowercase keys
+        lower_map = {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.items()}
+
+        # Apply by exact lower-case match
+        for wrong_lower, canonical in lower_map.items():
+            mask = cn_lower.eq(wrong_lower)
+            if mask.any():
+                filtered_df.loc[mask, 'college_name'] = canonical
+
+        filtered_df['college_name'] = filtered_df['college_name'].astype(str).str.strip()
+
     # ===== CATEGORICAL FILTERS ONLY (College, Department, Year) - Full width, better blending =====
+
     st.markdown("""
     <div class="main-filter-section">
         <h2 class="main-filter-title">🏫 College & Program Filters</h2>
@@ -26,24 +84,42 @@ def filter_data(df):
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            colleges = sorted(df['college_name'].dropna().unique().tolist()) if 'college_name' in df.columns else []
+            colleges = (
+                sorted(filtered_df['college_name'].dropna().unique().tolist())
+                if 'college_name' in filtered_df.columns
+                else []
+            )
+            # Remove any leftover variants from dropdown display using the unified mapping
+            colleges = [_normalize_college_name(pd.Series([c])).iloc[0] for c in colleges]
+
             selected_colleges = st.multiselect(
-                "🏛️ College", colleges, 
+                "🏛️ College", colleges,
                 default=st.session_state.get('selected_colleges', []),
                 key='college_multiselect',
                 help="Click dropdown or type to search colleges"
             )
-            
+
             custom_college = st.text_input(
-                "➕ Custom college name", 
+                "➕ Custom college name",
                 value=st.session_state.get('custom_college', ''),
                 key='custom_college_input',
                 placeholder="Type exact name e.g., 'New College'",
                 help="Filters students from exactly this college name"
             )
+
+            # Normalize the custom textbox to keep spelling variants together (unified mapping)
+            if custom_college.strip():
+                custom_college = _normalize_college_name(pd.Series([custom_college])).iloc[0]
+
+            # Also ensure the multiselect default chips don't show legacy variants (unified mapping)
+            if isinstance(selected_colleges, list):
+                selected_colleges = [_normalize_college_name(pd.Series([c])).iloc[0] for c in selected_colleges]
+                st.session_state['selected_colleges'] = selected_colleges
+
+
         
         with col2:
-            depts = sorted(df['department'].dropna().unique().tolist()) if 'department' in df.columns else []
+            depts = sorted(filtered_df['department'].dropna().unique().tolist()) if 'department' in filtered_df.columns else []
             selected_depts = st.multiselect(
                 "📚 Department", depts,
                 default=st.session_state.get('selected_depts', []),
@@ -59,7 +135,8 @@ def filter_data(df):
             )
         
         with col3:
-            years = sorted(df['year'].dropna().unique().tolist()) if 'year' in df.columns else []
+            # Use filtered_df (already normalized college_name) to keep dropdown labels consistent
+            years = sorted(filtered_df['year'].dropna().unique().tolist()) if 'year' in filtered_df.columns else []
             selected_years = st.multiselect(
                 "📅 Year", years,
                 default=st.session_state.get('selected_years', []),
@@ -71,7 +148,7 @@ def filter_data(df):
                 "➕ Custom year",
                 value=st.session_state.get('custom_year', ''),
                 key='custom_year_input',
-                placeholder="e.g., '1', '5'"
+                placeholder="e.g., '1', '4'"
             )
     
     # Apply categorical filters (case-insensitive partial match)
