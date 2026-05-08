@@ -10,10 +10,7 @@ USE_CSV = False
 
 MAIN_CSV = "STUDENTS - Sheet1"
 CSV_FILE = "CLASSIFICATIONS - Sheet1 (1).csv"
-
-# ---- Supabase connection ----
-# add
-
+3
 # Table schema provided by you: public."CLASSIFICATION"
 SUPA_DB = "CLASSIFICATION"
 
