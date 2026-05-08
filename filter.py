@@ -12,15 +12,20 @@ COLLEGE_VARIANT_CANONICAL_MAP = {
     "amrita": "Amrita Vishwa Vidyapeetham Mysuru",
 }
 
+# wrong/spelling-variant(lowercase) -> canonical department name(Display name)
+DEPARTMENT_VARIANT_CANONICAL_MAP = {
+    # Add department typo/name variants here
+    "integrated mca": "BCA + MCA",
+    "bcom finance": "BCom",
+}
+
+
 # Backwards-compatible alias (in case other modules import it)
 COLLEGE_CANONICAL = COLLEGE_VARIANT_CANONICAL_MAP
 
 
 def _normalize_college_name(series):
-    """Normalize college_name using the unified COLLEGE_VARIANT_CANONICAL_MAP.
-
-    This function is intended to be the single source of truth for spelling/typo variants.
-    """
+    """Normalize college_name using COLLEGE_VARIANT_CANONICAL_MAP (unified dictionary)."""
     if series is None:
         return series
 
@@ -36,16 +41,30 @@ def _normalize_college_name(series):
 
     return s
 
+def _normalize_department(series):
+    """Normalize department using DEPARTMENT_VARIANT_CANONICAL_MAP (unified dictionary)."""
+    if series is None:
+        return series
 
+    s = series.fillna("").astype(str).str.strip()
+    if not DEPARTMENT_VARIANT_CANONICAL_MAP:
+        return s
+
+    s_lower = s.astype(str).str.strip().str.lower()
+    for wrong_lower, canonical in {k.lower(): v for k, v in DEPARTMENT_VARIANT_CANONICAL_MAP.items()}.items():
+        mask = s_lower.eq(wrong_lower)
+        if mask.any():
+            s.loc[mask] = canonical
+
+    return s
 
 def filter_data(df):
     init_session_state()
 
     filtered_df = df.copy()
 
-    # Normalize known college spelling variants so filters/charts treat them as the same college
+    # Normalize known spelling variants so filters/charts treat them as the same category
     if 'college_name' in filtered_df.columns:
-        # Use unified canonical mapping for both filters + charts
         filtered_df['college_name'] = (
             filtered_df['college_name']
             .fillna('')
@@ -53,21 +72,32 @@ def filter_data(df):
             .str.strip()
         )
 
-        # Case-insensitive normalization via unified map
-        # (also handles different spellings for the same college)
-        cn = filtered_df['college_name']
-        cn_lower = cn.astype(str).str.strip().str.lower()
-
-        # Build mapping with lowercase keys
+        cn = filtered_df['college_name'].astype(str).str.strip().str.lower()
         lower_map = {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.items()}
-
-        # Apply by exact lower-case match
         for wrong_lower, canonical in lower_map.items():
-            mask = cn_lower.eq(wrong_lower)
+            mask = cn.eq(wrong_lower)
             if mask.any():
                 filtered_df.loc[mask, 'college_name'] = canonical
 
         filtered_df['college_name'] = filtered_df['college_name'].astype(str).str.strip()
+
+    if 'department' in filtered_df.columns:
+        filtered_df['department'] = (
+            filtered_df['department']
+            .fillna('')
+            .astype(str)
+            .str.strip()
+        )
+
+        dn = filtered_df['department'].astype(str).str.strip().str.lower()
+        dept_lower_map = {k.lower(): v for k, v in DEPARTMENT_VARIANT_CANONICAL_MAP.items()}
+        for wrong_lower, canonical in dept_lower_map.items():
+            mask = dn.eq(wrong_lower)
+            if mask.any():
+                filtered_df.loc[mask, 'department'] = canonical
+
+        filtered_df['department'] = filtered_df['department'].astype(str).str.strip()
+
 
     # ===== CATEGORICAL FILTERS ONLY (College, Department, Year) - Full width, better blending =====
 
@@ -307,7 +337,18 @@ def filter_data(df):
             st.warning("📋 No student_id column found in data - student filter disabled")
         
         if student_ids:
-            student_id = st.selectbox("🔍 Filter by Student ID", options=student_ids, index=0, format_func=lambda x: x[:8] + '...' + x[-4:])
+            def _format_student_id(x):
+                s = str(x).strip()
+                if len(s) <= 8:
+                    return s
+                return s[:8] + "..." + s[-4:]
+
+            student_id = st.selectbox(
+                "🔍 Filter by Student ID",
+                options=student_ids,
+                index=0,
+                format_func=_format_student_id,
+            )
         else:
             student_id = None
     with search_col2:
@@ -320,13 +361,22 @@ def filter_data(df):
         )
     
     if st.checkbox("👤 Show specific student data") and student_id:
-        if 'student_id' in filtered_df.columns and student_id in filtered_df['student_id'].values:
-            st.dataframe(filtered_df[filtered_df['student_id'] == student_id])
+        if 'student_id' in filtered_df.columns:
+            filtered_df = filtered_df.copy()
+            filtered_df['student_id'] = filtered_df['student_id'].fillna('').astype(str)
+            st.dataframe(filtered_df[filtered_df['student_id'] == str(student_id)])
         else:
             st.warning("Student ID not found or no student_id column")
     else:
         with st.expander("View All Filtered Data", expanded=False):
+            st.markdown(
+                """
+                <div class="filter-column" style="padding: 0.75rem; background: rgba(15,23,42,0.80) !important;">
+                """,
+                unsafe_allow_html=True,
+            )
             st.dataframe(filtered_df.reset_index(), width="stretch")
+            st.markdown("</div>", unsafe_allow_html=True)
     
     st.caption(f"💡 Auto-refreshes every {REFRESH_SECONDS}s | Student ID is unique identifier")
 
