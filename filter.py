@@ -3,26 +3,7 @@ import pandas as pd
 import plotly.express as px
 from constants import REFRESH_SECONDS
 from datetime import datetime
-
-
-# Unified canonical mapping used by filters + charts
-# wrong/spelling-variant(lowercase) -> canonical college name(Display name)
-COLLEGE_VARIANT_CANONICAL_MAP = {
-    "christ collage": "Christ College Vizhinjam",
-    "amrita": "Amrita Vishwa Vidyapeetham Mysuru",
-}
-
-# wrong/spelling-variant(lowercase) -> canonical department name(Display name)
-DEPARTMENT_VARIANT_CANONICAL_MAP = {
-    # Add department typo/name variants here
-    "integrated mca": "BCA + MCA",
-    "bcom finance": "BCom",
-}
-
-
-# Backwards-compatible alias (in case other modules import it)
-COLLEGE_CANONICAL = COLLEGE_VARIANT_CANONICAL_MAP
-
+from college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_CANONICAL_MAP
 
 def _normalize_college_name(series):
     """Normalize college_name using COLLEGE_VARIANT_CANONICAL_MAP (unified dictionary)."""
@@ -35,23 +16,6 @@ def _normalize_college_name(series):
 
     s_lower = s.astype(str).str.strip().str.lower()
     for wrong_lower, canonical in {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.items()}.items():
-        mask = s_lower.eq(wrong_lower)
-        if mask.any():
-            s.loc[mask] = canonical
-
-    return s
-
-def _normalize_department(series):
-    """Normalize department using DEPARTMENT_VARIANT_CANONICAL_MAP (unified dictionary)."""
-    if series is None:
-        return series
-
-    s = series.fillna("").astype(str).str.strip()
-    if not DEPARTMENT_VARIANT_CANONICAL_MAP:
-        return s
-
-    s_lower = s.astype(str).str.strip().str.lower()
-    for wrong_lower, canonical in {k.lower(): v for k, v in DEPARTMENT_VARIANT_CANONICAL_MAP.items()}.items():
         mask = s_lower.eq(wrong_lower)
         if mask.any():
             s.loc[mask] = canonical
