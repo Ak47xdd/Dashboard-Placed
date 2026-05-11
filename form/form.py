@@ -17,6 +17,9 @@ app.add_middleware(
         "http://localhost:5500",
         "https://dashboard-app-zggs.onrender.com",
         "https://dashboard-app-zggs.onrender.com/submit-profile",
+        "https://form-placed.vercel.app",
+        "https://form-placed.vercel.app/profiling.html",
+        "https://cron-job.org",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -177,7 +180,6 @@ async def submit_profile(form_data: dict):
     student_endpoint = f"{SUPABASE_URL}/rest/v1/{MAIN_TABLE_NAME}"
 
     # Debug: what backend actually receives
-    # (prints to terminal running FastAPI)
     print("[submit-profile] received form_data keys:", list(form_data.keys()))
     print("[submit-profile] student insert payload keys:", sorted(list(data.keys())))
     
