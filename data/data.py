@@ -5,16 +5,32 @@ from datetime import datetime, timezone
 from constants import USE_CSV
 from db_queries import fetch_classification_df
 
-def load_data():
+def load_data(view: str = "classification"):
+    """Load either classified scores or raw student data.
+
+    view:
+      - "classification" => Supabase CLASSIFICATION table (scores)
+      - "raw" => Supabase STUDENT_DATA table (questionnaire + metadata)
+    """
     # load from local CSV files (debug).
     if USE_CSV:
-        csv_path = "data/CLASSIFICATIONS - Sheet1 (1).csv"
+        if view == "raw":
+            csv_path = "data/STUDENTS - Sheet1.csv"
+        else:
+            csv_path = "data/CLASSIFICATIONS - Sheet1 (1).csv"
+
         if os.path.exists(csv_path):
             return pd.read_csv(csv_path)
         return pd.DataFrame()
 
     # Otherwise, load from Supabase.
+    if view == "raw":
+        from db_queries import fetch_student_raw_df
+
+        return fetch_student_raw_df()
+
     return fetch_classification_df()
+
 
 
 def add_student_entry(**kwargs):
