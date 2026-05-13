@@ -73,7 +73,6 @@ def _safe_value_counts(series: pd.Series) -> pd.DataFrame:
         return pd.DataFrame(columns=["value", "count"])
     return vc.reset_index().rename(columns={"index": "value", series.name: "value"})
 
-
 def render_student_tab(df: pd.DataFrame) -> None:
     if df is None or df.empty:
         st.info("No student data available.")
