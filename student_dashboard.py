@@ -39,7 +39,6 @@ DF_COLS_TO_DROP = [
     "commit_Q3",
 ]
 
-
 def _normalize_college_and_department(df: pd.DataFrame) -> pd.DataFrame:
     """Normalize spelling variants using canonical maps so filters/charts align."""
     out = df.copy()
@@ -65,7 +64,6 @@ def _normalize_college_and_department(df: pd.DataFrame) -> pd.DataFrame:
         out["department"] = s
 
     return out
-
 
 def _safe_value_counts(series: pd.Series) -> pd.DataFrame:
     vc = series.dropna().astype(str).value_counts()
