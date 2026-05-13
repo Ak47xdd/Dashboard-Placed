@@ -13,4 +13,4 @@ CSV_FILE = "CLASSIFICATIONS - Sheet1 (1).csv"
 3
 # Table schema provided by you: public."CLASSIFICATION"
 SUPA_DB = "CLASSIFICATION"
-
+SUPA_RAW_DB = "STUDENT_DATA"
