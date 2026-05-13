@@ -23,7 +23,22 @@ auto_refresh()
 
 st.caption(f"Auto-refresh every {REFRESH_SECONDS} seconds | Last updated: {datetime.now().strftime('%H:%M:%S')}")
 
-df = load_data()
-df = process_data(df)
+data_view = st.sidebar.radio(
+    "📌 Data view",
+    options=["Response Dashboard", "Student Evaluation Dashboard"],
+    index=0,
+    help="Choose 'Response Dashboard' to explore aggregated insights from student responses. Choose 'Student Evaluation Dashboard' to view detailed student-level data and filter by various criteria.",
+)
 
-filter_data(df)
+view = "raw" if data_view.startswith("Student") else "classification"
+
+df = load_data(view=view)
+
+# Only normalize numeric score columns for classification view.
+# Raw view may not contain these columns.
+if view == "classification":
+    df = process_data(df)
+
+filter_data(df, view=view)
+
+
