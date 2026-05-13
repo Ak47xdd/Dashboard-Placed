@@ -304,8 +304,6 @@ def render_student_tab(df: pd.DataFrame) -> None:
             fig_stack.update_layout(title="Engagement Frequency × Prep Test Status")
             st.plotly_chart(fig_stack, width="stretch")
 
-
-
     # ===== Data table (Raw STUDENT_DATA) =====
     st.subheader("Student Responses (Filtered)")
 
