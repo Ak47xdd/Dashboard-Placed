@@ -195,7 +195,6 @@ def render_student_tab(df: pd.DataFrame) -> None:
                 # but shows High/Medium/Low/None.
                 df[q] = mapped.map({1: "High", 2: "Medium", 3: "Low", 4: "None"})
 
-
     except Exception:
         # If mapping module isn't available for some reason, keep original values.
         pass
