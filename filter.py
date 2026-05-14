@@ -68,7 +68,6 @@ def filter_data(df, view: str = "classification"):
 
         filtered_df['department'] = filtered_df['department'].astype(str).str.strip()
 
-
     # ===== CATEGORICAL FILTERS ONLY (College, Department, Year) - Full width, better blending =====
 
     st.markdown("""
