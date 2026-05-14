@@ -4,7 +4,6 @@ import plotly.express as px
 
 from college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_CANONICAL_MAP
 
-
 ZERO_VARIANCE_COLS = [
     "learn_Q3",
     "learn_Q4",
