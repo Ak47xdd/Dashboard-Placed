@@ -33,7 +33,6 @@ def filter_data(df, view: str = "classification"):
 
     filtered_df = df.copy()
 
-
     # Normalize known spelling variants so filters/charts treat them as the same category
     if 'college_name' in filtered_df.columns:
         filtered_df['college_name'] = (
