@@ -198,8 +198,7 @@ def render_student_tab(df: pd.DataFrame) -> None:
     except Exception:
         # If mapping module isn't available for some reason, keep original values.
         pass
-
-
+    
     # learn_dims = [c for c in dims_all if c in df.columns and c not in ZERO_VARIANCE_COLS]
     # We will build flow as: learn_Q1 (prefer), instruct_Q1, content_pref_Q1, engage_Q1
     # flow_dims = [
