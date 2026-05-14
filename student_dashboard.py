@@ -78,13 +78,6 @@ def render_student_tab(df: pd.DataFrame) -> None:
 
     df = _normalize_college_and_department(df)
 
-    # Data volume warning
-    if len(df) < 20:
-        st.warning(
-            f"⚠️ Only {len(df)} students in the dataset. "
-            "Distributions are not stable yet — patterns will be meaningful once n ≥ 50."
-        )
-
     # KPI row
     required_id_cols = ["college_name", "department", "career_goal"]
     for c in required_id_cols:
@@ -185,34 +178,57 @@ def render_student_tab(df: pd.DataFrame) -> None:
     content_all = ["content_pref_Q1", "content_pref_Q2", "content_pref_Q3"]
     engage_all = ["engage_Q1", "engage_Q2", "engage_Q3", "engage_Q4"]
 
-    learn_dims = [c for c in dims_all if c in df.columns and c not in ZERO_VARIANCE_COLS]
-    # idea.md uses learn_Q1 only; keep it but also allow learn_Q2 if present.
+    # Map instructional-fit options into numeric profile scale (1 High, 2 Medium, 3 Low, 4 None)
+    # for instruct_Q2 and instruct_Q3.
+    try:
+        from questionnaire_instruct_map import (
+            normalize_instruct_value,
+        )
+
+        for q in ["instruct_Q2", "instruct_Q3"]:
+            if q in df.columns:
+                # Keep both mapped numeric code (for consistent charts) and
+                # a human-readable label (for the Student Responses table).
+                mapped = df[q].apply(normalize_instruct_value)
+
+                # Replace the original column values with the human-readable labels
+                # so the table keeps the same column name (instruct_Q2 / instruct_Q3)
+                # but shows High/Medium/Low/None.
+                df[q] = mapped.map({1: "High", 2: "Medium", 3: "Low", 4: "None"})
+
+
+    except Exception:
+        # If mapping module isn't available for some reason, keep original values.
+        pass
+
+
+    # learn_dims = [c for c in dims_all if c in df.columns and c not in ZERO_VARIANCE_COLS]
     # We will build flow as: learn_Q1 (prefer), instruct_Q1, content_pref_Q1, engage_Q1
-    flow_dims = [
-        "learn_Q1" if "learn_Q1" in df.columns else None,
-        "instruct_Q1" if "instruct_Q1" in df.columns else None,
-        "content_pref_Q1" if "content_pref_Q1" in df.columns else None,
-        "engage_Q1" if "engage_Q1" in df.columns else None,
-    ]
-    flow_dims = [d for d in flow_dims if d is not None and d not in ZERO_VARIANCE_COLS]
+    # flow_dims = [
+    #     "learn_Q1" if "learn_Q1" in df.columns else None,
+    #     "instruct_Q1" if "instruct_Q1" in df.columns else None,
+    #     "content_pref_Q1" if "content_pref_Q1" in df.columns else None,
+    #     "engage_Q1" if "engage_Q1" in df.columns else None,
+    # ]
+    # flow_dims = [d for d in flow_dims if d is not None and d not in ZERO_VARIANCE_COLS]
 
-    if len(flow_dims) >= 3:
-        # parallel_categories expects at least 2 dimensions
-        color_col = "career_goal" if "career_goal" in df.columns else None
-        tmp = df[flow_dims + ([color_col] if color_col else [])].dropna().copy()
-        if not tmp.empty:
-            tmp[color_col] = tmp[color_col].astype(str)
-            # Using codes like idea.md, but only if we have a color column.
-            color_codes = tmp[color_col].astype("category").cat.codes if color_col else None
+    # if len(flow_dims) >= 3:
+    #     # parallel_categories expects at least 2 dimensions
+    #     color_col = "career_goal" if "career_goal" in df.columns else None
+    #     tmp = df[flow_dims + ([color_col] if color_col else [])].dropna().copy()
+    #     if not tmp.empty:
+    #         tmp[color_col] = tmp[color_col].astype(str)
+    #         # Using codes like idea.md, but only if we have a color column.
+    #         color_codes = tmp[color_col].astype("category").cat.codes if color_col else None
 
-            fig_pc = px.parallel_categories(
-                tmp,
-                dimensions=flow_dims,
-                color=color_codes,
-                color_continuous_scale=px.colors.sequential.Inferno,
-            )
-            fig_pc.update_layout(title="Learning Profile Flow")
-            st.plotly_chart(fig_pc, width="stretch")
+    #         fig_pc = px.parallel_categories(
+    #             tmp,
+    #             dimensions=flow_dims,
+    #             color=color_codes,
+    #             color_continuous_scale=px.colors.sequential.Inferno,
+    #         )
+    #         fig_pc.update_layout(title="Learning Profile Flow")
+    #         st.plotly_chart(fig_pc, width="stretch")
 
     # Heatmap: question × response frequency (as %)
     heat_questions = [
@@ -276,7 +292,7 @@ def render_student_tab(df: pd.DataFrame) -> None:
                 orientation="h",
                 color="count",
                 color_continuous_scale="Viridis",
-                title="What Motivates Engagement (engage_Q3)",
+                title="What Motivates Engagement",
             )
             fig.update_layout(yaxis_title="Engagement Factor", xaxis_title="Number of Students")
             st.plotly_chart(fig, width="stretch")
@@ -306,6 +322,12 @@ def render_student_tab(df: pd.DataFrame) -> None:
 
     # Remove zero-variance columns and score-related columns (scores only exist in classification view)
     cols_to_drop = set(DF_COLS_TO_DROP)
+    # Show human-readable labels instead of numeric codes in the table.
+    for q in ["instruct_Q2", "instruct_Q3"]:
+        if f"{q}_label" in df.columns:
+            cols_to_drop.add(q)
+
+
     score_cols = {
         "quant_score",
         "logic_score",
