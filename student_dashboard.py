@@ -324,7 +324,6 @@ def render_student_tab(df: pd.DataFrame) -> None:
         if f"{q}_label" in df.columns:
             cols_to_drop.add(q)
 
-
     score_cols = {
         "quant_score",
         "logic_score",
