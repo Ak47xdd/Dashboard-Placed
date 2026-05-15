@@ -72,7 +72,7 @@ def filter_data(df, view: str = "classification"):
 
     st.markdown("""
     <div class="main-filter-section">
-        <h2 class="main-filter-title">🏫 College & Program Filters</h2>
+        <h2 class="main-filter-title">College & Program Filters</h2>
         <p class="filter-subtitle">Select colleges, departments, years or type custom values. Leave empty to show all.</p>
     </div>
     """, unsafe_allow_html=True)
@@ -92,14 +92,14 @@ def filter_data(df, view: str = "classification"):
             colleges = [_normalize_college_name(pd.Series([c])).iloc[0] for c in colleges]
 
             selected_colleges = st.multiselect(
-                "🏛️ College", colleges,
+                "College", colleges,
                 default=st.session_state.get('selected_colleges', []),
                 key='college_multiselect',
                 help="Click dropdown or type to search colleges"
             )
 
             custom_college = st.text_input(
-                "➕ Custom college name",
+                "Custom college name",
                 value=st.session_state.get('custom_college', ''),
                 key='custom_college_input',
                 placeholder="Type exact name e.g., 'New College'",
@@ -120,14 +120,14 @@ def filter_data(df, view: str = "classification"):
         with col2:
             depts = sorted(filtered_df['department'].dropna().unique().tolist()) if 'department' in filtered_df.columns else []
             selected_depts = st.multiselect(
-                "📚 Department", depts,
+                "Department", depts,
                 default=st.session_state.get('selected_depts', []),
                 key='dept_multiselect',
                 help="Click dropdown or type to search departments"
             )
             
             custom_dept = st.text_input(
-                "➕ Custom department",
+                "Custom department",
                 value=st.session_state.get('custom_dept', ''),
                 key='custom_dept_input',
                 placeholder="e.g., 'BTech CS', 'MCA'"
@@ -137,14 +137,14 @@ def filter_data(df, view: str = "classification"):
             # Use filtered_df (already normalized college_name) to keep dropdown labels consistent
             years = sorted(filtered_df['year'].dropna().unique().tolist()) if 'year' in filtered_df.columns else []
             selected_years = st.multiselect(
-                "📅 Year", years,
+                "Year", years,
                 default=st.session_state.get('selected_years', []),
                 key='year_multiselect',
                 help="Click dropdown or type year numbers"
             )
             
             custom_year = st.text_input(
-                "➕ Custom year",
+                "Custom year",
                 value=st.session_state.get('custom_year', ''),
                 key='custom_year_input',
                 placeholder="e.g., '1', '4'"
@@ -182,12 +182,12 @@ def filter_data(df, view: str = "classification"):
     with col_summary1:
         st.markdown(f"""
         <div class="filter-stats">
-            <strong>📊 Showing {len(filtered_df)} of {len(df)} students</strong>
+            <strong>Showing {len(filtered_df)} of {len(df)} students</strong>
             {' | Filters: ' + ' | '.join(filter_summary) if filter_summary else ''}
         </div>
         """, unsafe_allow_html=True)
     with col_summary2:
-        if st.button("🔄 Clear All Filters", key="clear_filters_btn"):
+        if st.button("Clear All Filters", key="clear_filters_btn"):
             st.session_state['selected_colleges'] = []
             st.session_state['custom_college'] = ''
             st.session_state['selected_depts'] = []
@@ -197,8 +197,8 @@ def filter_data(df, view: str = "classification"):
             st.rerun()
     
     if filtered_df.empty:
-        st.warning("👻 No students match your filters!")
-        st.info("💡 Leave dropdowns empty to show all students, or check your custom text spelling.")
+        st.warning("No students match your filters!")
+        st.info("Leave dropdowns empty to show all students, or check your custom text spelling.")
         st.stop()  # Stop rendering below
     
     # Update session state
@@ -215,7 +215,7 @@ def filter_data(df, view: str = "classification"):
     score_columns_present = any(c in filtered_df.columns for c in ["final_score", "quant_score", "logic_score", "verbal_score"]) 
 
     if score_columns_present and "final_score" in filtered_df.columns:
-        st.markdown("### 🎯 Key Performance Indicators")
+        st.markdown("### Key Performance Indicators")
 
         total_students = len(filtered_df)
         avg_quant = filtered_df['quant_score'].mean() if 'quant_score' in filtered_df.columns else 0
@@ -227,20 +227,20 @@ def filter_data(df, view: str = "classification"):
         top_score = filtered_df['final_score'].max() if 'final_score' in filtered_df.columns else 0
 
         col1, col2, col3, col4 = st.columns(4)
-        col1.metric("👥 Total Students", total_students)
-        col2.metric("📊 Avg Quantitative Aptitude Score", f"{avg_quant:.1f}")
-        col3.metric("🧠 Avg Logical Reasoning Score", f"{avg_logic:.1f}")
-        col4.metric("💬 Avg Verbal Ability Score", f"{avg_verbal:.1f}")
+        col1.metric("Total Students", total_students)
+        col2.metric("Avg Quantitative Aptitude Score", f"{avg_quant:.1f} / 5.0")
+        col3.metric("Avg Logical Reasoning Score", f"{avg_logic:.1f} / 5.0")
+        col4.metric("Avg Verbal Ability Score", f"{avg_verbal:.1f} / 5.0")
 
         col5, col6, col7, col8 = st.columns(4)
-        col5.metric("🏆 Avg Final Score", f"{avg_final:.1f}")
-        col6.metric("⭐ Tier A (75+)", top_final_90)
-        col7.metric("👑 Tier B (45+)", top_final)
-        col8.metric("🥇 #1 Performer", f"{top_score:.1f}")
+        col5.metric("Avg Final Score", f"{avg_final:.1f}%")
+        col6.metric("Tier A (75%+)", f"{top_final_90}")
+        col7.metric("Tier B (45%+)", f"{top_final}")
+        col8.metric("#1 Performer's Score", f"{top_score:.1f}%")
 
     # ===== Score Analytics (only if score columns exist) =====
     if "final_score" in filtered_df.columns:
-        st.markdown("### 📈 Score Analytics")
+        st.markdown("### Score Analytics")
         row1_col1, row1_col2 = st.columns(2)
         
         with row1_col1:
@@ -297,7 +297,7 @@ def filter_data(df, view: str = "classification"):
             fig_year.update_layout(showlegend=False, hovermode='x unified')
             st.plotly_chart(fig_year, width="stretch")
 
-        st.markdown("### 🏆 Top 10 Performers (Final Score)")
+        st.markdown("### Top 10 Performers (Final Score)")
         top_students = filtered_df.nlargest(10, 'final_score')[[
             'quant_score' if 'quant_score' in filtered_df.columns else filtered_df.columns[0],
             'logic_score' if 'logic_score' in filtered_df.columns else filtered_df.columns[0],
@@ -309,10 +309,10 @@ def filter_data(df, view: str = "classification"):
         st.dataframe(top_students, width="stretch")
 
         st.markdown("---")
-        st.markdown("### 📋 Student Scores Table")
+        st.markdown("### Student Scores Table")
     else:
         st.info("Score Analytics skipped: loaded dataset has no final_score column.")
-        st.markdown("### 📋 Student Scores Table")
+        st.markdown("### Student Scores Table")
 
     
     search_col1, search_col2 = st.columns([3, 1])
@@ -322,7 +322,7 @@ def filter_data(df, view: str = "classification"):
             student_ids = sorted(df['student_id'].drop_duplicates().dropna().unique().tolist())
         else:
             student_ids = []
-            st.warning("📋 No student_id column found in data - student filter disabled")
+            st.warning("No student_id column found in data - student filter disabled")
         
         if student_ids:
             def _format_student_id(x):
@@ -332,7 +332,7 @@ def filter_data(df, view: str = "classification"):
                 return s[:8] + "..." + s[-4:]
 
             student_id = st.selectbox(
-                "🔍 Filter by Student ID",
+                "Filter by Student ID",
                 options=student_ids,
                 index=0,
                 format_func=_format_student_id,
@@ -342,13 +342,13 @@ def filter_data(df, view: str = "classification"):
     with search_col2:
         csv = filtered_df.reset_index().to_csv(index=False)
         st.download_button(
-            label="📥 Export CSV",
+            label="Export CSV",
             data=csv,
             file_name=f"classifications_scores_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
             mime="text/csv"
         )
     
-    if st.checkbox("👤 Show specific student data") and student_id:
+    if st.checkbox("Show specific student data") and student_id:
         if 'student_id' in filtered_df.columns:
             filtered_df = filtered_df.copy()
             filtered_df['student_id'] = filtered_df['student_id'].fillna('').astype(str)
@@ -366,7 +366,7 @@ def filter_data(df, view: str = "classification"):
             st.dataframe(filtered_df.reset_index(), width="stretch")
             st.markdown("</div>", unsafe_allow_html=True)
     
-    st.caption(f"💡 Auto-refreshes every {REFRESH_SECONDS}s | Student ID is unique identifier")
+    st.caption(f"Auto-refreshes every {REFRESH_SECONDS}s | Student ID is unique identifier")
 
 def init_session_state():
     """Initialize session state for categorical filters only"""
