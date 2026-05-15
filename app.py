@@ -6,7 +6,6 @@ from frontend.styles import load_styles, set_page_config, auto_refresh
 from filter import filter_data
 from constants import REFRESH_SECONDS
 
-
 # Load all styles FIRST - this ensures they persist on refresh/rerun
 load_styles()
 set_bg_image()
