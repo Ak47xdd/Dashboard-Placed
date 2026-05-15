@@ -24,7 +24,6 @@ INSTRUCT_Q3_MAP = {
     "None": 4,
 }
 
-
 def normalize_instruct_value(x):
     """Normalize a single raw value to the 1..4 scale.
 
