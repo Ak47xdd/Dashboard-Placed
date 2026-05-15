@@ -1,9 +1,12 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-
+import plotly.graph_objects as go
+ 
 from college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_CANONICAL_MAP
-
+ 
+# ─── Constants ────────────────────────────────────────────────────────────────
+ 
 ZERO_VARIANCE_COLS = [
     "learn_Q3",
     "learn_Q4",
@@ -13,380 +16,648 @@ ZERO_VARIANCE_COLS = [
     "commit_Q1",
     "commit_Q4",
 ]
-
+ 
 DF_COLS_TO_DROP = [
-    "quant_Q1",
-    "quant_Q2",
-    "quant_Q3",
-    "quant_Q4",
-    "quant_Q5",
-    "logic_Q1",
-    "logic_Q2",
-    "logic_Q3",
-    "logic_Q4",
-    "logic_Q5",
-    "verbal_Q1",
-    "verbal_Q2",
-    "verbal_Q3",
-    "verbal_Q4",
-    "verbal_Q5",
-    "behave_Q1",
-    "behave_Q2",
-    "behave_Q3",
-    "behave_Q4",
-    "behave_Q5",
+    "quant_Q1", "quant_Q2", "quant_Q3", "quant_Q4", "quant_Q5",
+    "logic_Q1", "logic_Q2", "logic_Q3", "logic_Q4", "logic_Q5",
+    "verbal_Q1", "verbal_Q2", "verbal_Q3", "verbal_Q4", "verbal_Q5",
+    "behave_Q1", "behave_Q2", "behave_Q3", "behave_Q4", "behave_Q5",
     "commit_Q3",
 ]
-
-def _normalize_college_and_department(df: pd.DataFrame) -> pd.DataFrame:
-    """Normalize spelling variants using canonical maps so filters/charts align."""
+ 
+# Consistent chart height used across every figure so rows align
+CHART_H = 400
+ 
+# ─── Helpers ──────────────────────────────────────────────────────────────────
+ 
+def _normalize(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
-
     if "college_name" in out.columns and COLLEGE_VARIANT_CANONICAL_MAP:
         s = out["college_name"].fillna("").astype(str).str.strip()
         cn_map = {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.items()}
         s_lower = s.str.lower()
-        for wrong_lower, canonical in cn_map.items():
-            mask = s_lower.eq(wrong_lower)
-            if mask.any():
-                s.loc[mask] = canonical
+        for wrong, canonical in cn_map.items():
+            s.loc[s_lower.eq(wrong)] = canonical
         out["college_name"] = s
-
+ 
     if "department" in out.columns and DEPARTMENT_VARIANT_CANONICAL_MAP:
         s = out["department"].fillna("").astype(str).str.strip()
         dn_map = {k.lower(): v for k, v in DEPARTMENT_VARIANT_CANONICAL_MAP.items()}
         s_lower = s.str.lower()
-        for wrong_lower, canonical in dn_map.items():
-            mask = s_lower.eq(wrong_lower)
-            if mask.any():
-                s.loc[mask] = canonical
+        for wrong, canonical in dn_map.items():
+            s.loc[s_lower.eq(wrong)] = canonical
         out["department"] = s
-
+ 
     return out
-
-def _safe_value_counts(series: pd.Series) -> pd.DataFrame:
-    vc = series.dropna().astype(str).value_counts()
-    if vc.empty:
-        return pd.DataFrame(columns=["value", "count"])
-    return vc.reset_index().rename(columns={"index": "value", series.name: "value"})
-
+ 
+ 
+def _value_counts_df(series: pd.Series, name: str) -> pd.DataFrame:
+    vc = series.dropna().astype(str).value_counts().reset_index()
+    vc.columns = [name, "count"]
+    return vc
+ 
+ 
+# ─── Section 3 sub-renderers ─────────────────────────────────────────────────
+ 
+def _render_seek_answers_bar(df: pd.DataFrame) -> None:
+    """
+    Chart 3A — Full-width single-row stacked bar.
+    Answers: 'How do students seek answers when stuck?'
+    One glance shows the split — no axes, no numbers to decode.
+    """
+    if "learn_Q1" not in df.columns:
+        st.info("Missing learn_Q1 column.")
+        return
+ 
+    counts = _value_counts_df(df["learn_Q1"], "learn_Q1")
+    total  = counts["count"].sum()
+    counts["pct"] = (counts["count"] / total * 100).round(1)
+ 
+    fig = go.Figure()
+    colors = px.colors.qualitative.Pastel
+    for i, row in counts.iterrows():
+        label = row["learn_Q1"]
+        n     = row["count"]
+        pct   = row["pct"]
+        fig.add_trace(go.Bar(
+            x=[n],
+            y=["Students"],
+            orientation="h",
+            name=label,
+            text=f"{label}<br>{n} student{'s' if n != 1 else ''} ({pct}%)",
+            textposition="inside",
+            insidetextanchor="middle",
+            marker_color=colors[i % len(colors)],
+            hovertemplate=f"<b>{label}</b><br>{n} students ({pct}%)<extra></extra>",
+        ))
+ 
+    fig.update_layout(
+        barmode="stack",
+        title="How do students seek answers when stuck?",
+        xaxis=dict(visible=False),
+        yaxis=dict(visible=False),
+        showlegend=True,
+        legend=dict(orientation="h", yanchor="bottom", y=1.08, xanchor="left", x=0),
+        height=140,
+        margin=dict(t=70, b=10, l=10, r=10),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+    )
+    st.plotly_chart(fig, width="stretch")
+ 
+ 
+def _render_teaching_style_bubble(df: pd.DataFrame) -> None:
+    """
+    Chart 3B — Bubble matrix.
+    X = preferred teaching approach (instruct_Q1)
+    Y = self-assessment confidence (instruct_Q6)
+    Bubble size = number of students at that combination
+    Color = feedback timing preference (instruct_Q5)
+ 
+    Answers: 'What teaching style fits them?'
+    A teacher reads this in seconds — bigger bubbles = where most students cluster.
+    """
+    needed = ["instruct_Q1", "instruct_Q6"]
+    if not all(c in df.columns for c in needed):
+        st.info("Missing instruct_Q1 or instruct_Q6 columns.")
+        return
+ 
+    color_col  = "instruct_Q5" if "instruct_Q5" in df.columns else None
+    group_cols = needed + ([color_col] if color_col else [])
+ 
+    agg = (
+        df[group_cols]
+        .dropna()
+        .astype(str)
+        .groupby(group_cols)
+        .size()
+        .reset_index(name="count")
+    )
+ 
+    if agg.empty:
+        st.info("Not enough data for teaching style chart.")
+        return
+ 
+    # Enforce a readable confidence order on y-axis
+    confidence_order = ["Low", "Medium", "High"]
+    agg["instruct_Q6"] = pd.Categorical(
+        agg["instruct_Q6"], categories=confidence_order, ordered=True
+    )
+    agg = agg.sort_values("instruct_Q6")
+ 
+    fig = px.scatter(
+        agg,
+        x="instruct_Q1",
+        y="instruct_Q6",
+        size="count",
+        color=color_col,
+        size_max=60,
+        color_discrete_sequence=px.colors.qualitative.Bold,
+        labels={
+            "instruct_Q1": "Preferred Teaching Approach",
+            "instruct_Q6": "Self-Assessment Confidence",
+            "instruct_Q5": "Feedback Timing",
+            "count":       "Students",
+        },
+        title="What teaching style fits them?",
+        hover_data={"count": True, "instruct_Q1": True, "instruct_Q6": True},
+    )
+    fig.update_traces(marker=dict(line=dict(width=1, color="white")))
+    fig.update_layout(
+        height=CHART_H,
+        margin=dict(t=50, b=60, l=10, r=10),
+        xaxis_tickangle=-20,
+        legend_title_text="Feedback Timing" if color_col else "",
+        legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="right", x=0.5),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+    )
+    st.plotly_chart(fig, width="stretch")
+ 
+ 
+def _render_content_engage_donuts(df: pd.DataFrame) -> None:
+    """
+    Chart 3C — Two small donuts stacked vertically inside a single column.
+    Top donut:    content_pref_Q1 — preferred content format
+    Bottom donut: engage_Q1       — preferred activity style
+ 
+    Answers: 'What content and activities do they prefer?'
+    Pure part-of-whole — nothing to trace, no axes to read.
+    Sits in the right column next to Chart 3B.
+    """
+    left_col  = "content_pref_Q1"
+    right_col = "engage_Q1"
+ 
+    has_left  = left_col  in df.columns
+    has_right = right_col in df.columns
+ 
+    if not has_left and not has_right:
+        st.info("Missing content_pref_Q1 and engage_Q1 columns.")
+        return
+ 
+    if has_left:
+        counts = _value_counts_df(df[left_col], left_col)
+        fig = px.pie(
+            counts, names=left_col, values="count", hole=0.5,
+            title="Preferred content format",
+            color_discrete_sequence=px.colors.qualitative.Pastel,
+        )
+        fig.update_traces(textposition="outside", textinfo="percent+label")
+        fig.update_layout(
+            showlegend=False,
+            height=CHART_H // 2,
+            margin=dict(t=40, b=20, l=40, r=40),
+        )
+        st.plotly_chart(fig, width="stretch")
+ 
+    if has_right:
+        counts = _value_counts_df(df[right_col], right_col)
+        fig = px.pie(
+            counts, names=right_col, values="count", hole=0.5,
+            title="Preferred activity style",
+            color_discrete_sequence=px.colors.qualitative.Bold,
+        )
+        fig.update_traces(textposition="outside", textinfo="percent+label")
+        fig.update_layout(
+            showlegend=False,
+            height=CHART_H // 2,
+            margin=dict(t=40, b=20, l=40, r=40),
+        )
+        st.plotly_chart(fig, width="stretch")
+ 
+ 
+# ─── Main render ──────────────────────────────────────────────────────────────
+ 
 def render_student_tab(df: pd.DataFrame) -> None:
     if df is None or df.empty:
         st.info("No student data available.")
         return
 
-    df = _normalize_college_and_department(df)
+    # Session state defaults for College & Program Filters (port from filter.py)
+    defaults = {
+        'selected_colleges': [],
+        'custom_college': '',
+        'selected_depts': [],
+        'custom_dept': '',
+        'selected_years': [],
+        'custom_year': ''
+    }
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
 
-    # KPI row
-    required_id_cols = ["college_name", "department", "career_goal"]
-    for c in required_id_cols:
-        if c not in df.columns:
-            # KPI will still render with partial data
-            pass
+    def _normalize_college_name(series):
+        """Normalize college_name using COLLEGE_VARIANT_CANONICAL_MAP (unified dictionary)."""
+        if series is None:
+            return series
+        s = series.fillna("").astype(str).str.strip()
+        if not COLLEGE_VARIANT_CANONICAL_MAP:
+            return s
+        s_lower = s.astype(str).str.strip().str.lower()
+        for wrong_lower, canonical in {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.items()}.items():
+            mask = s_lower.eq(wrong_lower)
+            if mask.any():
+                s.loc[mask] = canonical
+        return s
+
+    def _normalize_dept_name(series):
+        if series is None:
+            return series
+        s = series.fillna("").astype(str).str.strip()
+        if not DEPARTMENT_VARIANT_CANONICAL_MAP:
+            return s
+        s_lower = s.astype(str).str.strip().str.lower()
+        for wrong_lower, canonical in {k.lower(): v for k, v in DEPARTMENT_VARIANT_CANONICAL_MAP.items()}.items():
+            mask = s_lower.eq(wrong_lower)
+            if mask.any():
+                s.loc[mask] = canonical
+        return s
+
+    df = _normalize(df)
+
+    # College & Program Filters (port UI + logic from filter.py)
+    st.markdown(
+        """
+        <div class="main-filter-section">
+            <h2 class="main-filter-title"> College & Program Filters</h2>
+            <p class="filter-subtitle">Select colleges, departments, years or type custom values. Leave empty to show all.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    filter_container = st.container()
+    with filter_container:
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            colleges = (
+                sorted(df['college_name'].dropna().unique().tolist())
+                if 'college_name' in df.columns
+                else []
+            )
+            colleges = [_normalize_college_name(pd.Series([c])).iloc[0] for c in colleges]
+
+            selected_colleges = st.multiselect(
+                "Colleges",
+                colleges,
+                default=st.session_state.get('selected_colleges', []),
+                key='college_multiselect',
+                help="Click dropdown or type to search colleges",
+            )
+
+            custom_college = st.text_input(
+                "Custom college name",
+                value=st.session_state.get('custom_college', ''),
+                key='custom_college_input',
+                placeholder="Type exact name e.g., 'New College'",
+                help="Filters students from exactly this college name",
+            )
+
+            if custom_college.strip():
+                custom_college = _normalize_college_name(pd.Series([custom_college])).iloc[0]
+
+            if isinstance(selected_colleges, list):
+                selected_colleges = [_normalize_college_name(pd.Series([c])).iloc[0] for c in selected_colleges]
+                st.session_state['selected_colleges'] = selected_colleges
+
+        with col2:
+            depts = (
+                sorted(df['department'].dropna().unique().tolist())
+                if 'department' in df.columns
+                else []
+            )
+            selected_depts = st.multiselect(
+                "Department",
+                depts,
+                default=st.session_state.get('selected_depts', []),
+                key='dept_multiselect',
+                help="Click dropdown or type to search departments",
+            )
+
+            custom_dept = st.text_input(
+                "Custom department",
+                value=st.session_state.get('custom_dept', ''),
+                key='custom_dept_input',
+                placeholder="e.g., 'BTech CS', 'MCA'",
+            )
+
+        with col3:
+            years = (
+                sorted(df['year'].dropna().unique().tolist())
+                if 'year' in df.columns
+                else []
+            )
+            selected_years = st.multiselect(
+                "🎥 Year",
+                years,
+                default=st.session_state.get('selected_years', []),
+                key='year_multiselect',
+                help="Click dropdown or type year numbers",
+            )
+
+            custom_year = st.text_input(
+                "Custom year",
+                value=st.session_state.get('custom_year', ''),
+                key='custom_year_input',
+                placeholder="e.g., '1', '4'",
+            )
+
+    # Apply categorical filters (case-insensitive partial match)
+    filtered_df = df.copy()
+
+    all_colleges = list(selected_colleges) if isinstance(selected_colleges, list) else []
+    if isinstance(custom_college, str) and custom_college.strip():
+        all_colleges.append(custom_college.strip())
+    if all_colleges and 'college_name' in filtered_df.columns:
+        filtered_df = filtered_df[
+            filtered_df['college_name'].str.contains('|'.join(all_colleges), case=False, na=False)
+        ]
+
+    all_depts = list(selected_depts) if isinstance(selected_depts, list) else []
+    if isinstance(custom_dept, str) and custom_dept.strip():
+        custom_dept = _normalize_dept_name(pd.Series([custom_dept])).iloc[0]
+        all_depts.append(custom_dept.strip())
+    if all_depts and 'department' in filtered_df.columns:
+        filtered_df = filtered_df[
+            filtered_df['department'].str.contains('|'.join(all_depts), case=False, na=False)
+        ]
+
+    all_years_str = [str(y) for y in selected_years] if isinstance(selected_years, list) else []
+    if isinstance(custom_year, str) and custom_year.strip():
+        all_years_str.append(custom_year.strip())
+    if all_years_str and 'year' in filtered_df.columns:
+        filtered_df = filtered_df[
+            filtered_df['year'].astype(str).str.contains('|'.join(all_years_str), case=False, na=False)
+        ]
+
+    filter_summary = []
+    if selected_colleges or (isinstance(custom_college, str) and custom_college.strip()):
+        filter_summary.append(
+            f"College: {', '.join(selected_colleges[:2])}{'...' if len(selected_colleges)>2 else ''}{' + custom' if (isinstance(custom_college, str) and custom_college.strip()) else ''}"
+        )
+    if selected_depts or (isinstance(custom_dept, str) and custom_dept.strip()):
+        filter_summary.append(
+            f"Dept: {', '.join(selected_depts[:2])}{'...' if len(selected_depts)>2 else ''}{' + custom' if (isinstance(custom_dept, str) and custom_dept.strip()) else ''}"
+        )
+    if selected_years or (isinstance(custom_year, str) and custom_year.strip()):
+        filter_summary.append(
+            f"Year: {', '.join(map(str, selected_years[:2]))}{'...' if len(selected_years)>2 else ''}{' + custom' if (isinstance(custom_year, str) and custom_year.strip()) else ''}"
+        )
+
+    col_summary1, col_summary2 = st.columns([3, 1])
+    with col_summary1:
+        st.markdown(
+            f"""
+            <div class="filter-stats">
+                <strong>Showing {len(filtered_df)} of {len(df)} students</strong>
+                {' | Filters: ' + ' | '.join(filter_summary) if filter_summary else ''}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with col_summary2:
+        if st.button("Clear All Filters", key="clear_filters_btn"):
+            st.session_state['selected_colleges'] = []
+            st.session_state['custom_college'] = ''
+            st.session_state['selected_depts'] = []
+            st.session_state['custom_dept'] = ''
+            st.session_state['selected_years'] = []
+            st.session_state['custom_year'] = ''
+            st.rerun()
+
+    if filtered_df.empty:
+        st.warning("No students match your filters!")
+        st.info("Leave dropdowns empty to show all students, or check your custom text spelling.")
+        st.stop()
+
+    st.session_state.selected_colleges = selected_colleges
+    st.session_state.custom_college = custom_college if isinstance(custom_college, str) else ''
+    st.session_state.selected_depts = selected_depts
+    st.session_state.custom_dept = custom_dept if isinstance(custom_dept, str) else ''
+    st.session_state.selected_years = selected_years
+    st.session_state.custom_year = custom_year if isinstance(custom_year, str) else ''
+
+    df = filtered_df
+
+    # ─── KPI Row ──────────────────────────────────────────────────────────────
 
     placement_pct = 0.0
     if "career_goal" in df.columns:
-        # Heuristic: treat career_goal containing 'placement' as placement seekers
-        placement_mask = df["career_goal"].astype(str).str.lower().str.contains("placement")
-        placement_pct = placement_mask.mean() * 100
-
+        placement_pct = (
+            df["career_goal"].astype(str).str.lower().str.contains("placement").mean() * 100
+        )
+ 
     k1, k2, k3, k4 = st.columns(4)
-    k1.metric("👥 Total Students", len(df))
-    k2.metric("🏫 Colleges", df["college_name"].nunique() if "college_name" in df.columns else "-")
-    k3.metric("📚 Departments", df["department"].nunique() if "department" in df.columns else "-")
-    k4.metric("🎯 In-Campus Placement Seekers", f"{placement_pct:.0f}%")
-
+    k1.metric("Total Students",    len(df))
+    k2.metric("Colleges",          df["college_name"].nunique() if "college_name" in df.columns else "-")
+    k3.metric("Departments",        df["department"].nunique()   if "department"   in df.columns else "-")
+    k4.metric("In-Campus Placement Seekers",  f"{placement_pct:.0f}%")
+ 
     st.markdown("---")
-
-    # ===== Section 1 — Who Are They? =====
+ 
+    # ─── Section 1 — Who Are They? ────────────────────────────────────────────
     st.subheader("Student Demographics & Background")
-
+ 
     col1, col2 = st.columns([2, 1])
-
+ 
     with col1:
         if all(c in df.columns for c in ["college_name", "department", "year"]):
-            sun = px.sunburst(
+            fig = px.sunburst(
                 df,
                 path=["college_name", "department", "year"],
-                color="year" if "year" in df.columns else None,
                 color_discrete_sequence=px.colors.qualitative.Pastel,
+                title="College → Department → Year Distribution",
             )
-            sun.update_layout(title="College → Department → Year Distribution")
-            st.plotly_chart(sun, width="stretch")
-
+            fig.update_layout(
+                height=CHART_H,
+                margin=dict(t=40, b=10, l=10, r=10),
+            )
+            st.plotly_chart(fig, width="stretch")
         else:
-            st.info("Missing college_name / department / year columns for sunburst.")
-
+            st.info("Missing college_name / department / year columns.")
+ 
     with col2:
         if "medium" in df.columns:
-            medium_counts = (
-                df["medium"].dropna().astype(str).value_counts().reset_index()
+            counts = _value_counts_df(df["medium"], "medium")
+            fig = px.pie(
+                counts, names="medium", values="count", hole=0.45,
+                title="Medium of Instruction",
+                color_discrete_sequence=px.colors.qualitative.Pastel,
             )
-            medium_counts.columns = ["medium", "count"]
-            donut = px.pie(
-                medium_counts,
-                names="medium",
-                values="count",
-                hole=0.45,
+            fig.update_traces(textposition="outside", textinfo="percent+label")
+            fig.update_layout(
+                height=CHART_H,
+                showlegend=True,
+                legend=dict(orientation="h", yanchor="bottom", y=-0.15, xanchor="center", x=0.5),
+                margin=dict(t=40, b=40, l=10, r=10),
             )
-            donut.update_layout(title="Medium of Instruction")
-            st.plotly_chart(donut, width="stretch")
+            st.plotly_chart(fig, width="stretch")
         else:
-            st.info("Missing medium column for donut.")
-
-    # ===== Section 2 — Goals & Readiness =====
+            st.info("Missing medium column.")
+ 
+    st.markdown("---")
+ 
+    # ─── Section 2 — Goals & Readiness ───────────────────────────────────────
     st.subheader("Goals & Readiness")
-    col1, col2 = st.columns([1, 1])
-
+ 
+    col1, col2 = st.columns(2)
+ 
     with col1:
         if all(c in df.columns for c in ["career_goal", "have_prep_test"]):
-            tmp = df[["career_goal", "have_prep_test"]].dropna().copy()
-            tmp["career_goal"] = tmp["career_goal"].astype(str).str.strip()
-            tmp["have_prep_test"] = tmp["have_prep_test"].astype(str).str.strip()
-
+            tmp = df[["career_goal", "have_prep_test"]].dropna().astype(str).copy()
             fig = px.bar(
-                tmp,
-                y="career_goal",
-                color="have_prep_test",
-                orientation="h",
-                barmode="group",
-                title="Career Goal × Prep Test Status",
+                tmp, y="career_goal", color="have_prep_test",
+                orientation="h", barmode="group",
+                title="Career Goals vs Prep Test Status",
+                color_discrete_sequence=px.colors.qualitative.Bold,
+                labels={"career_goal": "", "have_prep_test": "Prep Test"},
             )
-            fig.update_layout(yaxis_title="Career Goal", xaxis_title="Number of Students")
+            fig.update_layout(
+                height=CHART_H,
+                xaxis_title="Number of Students",
+                legend_title_text="Prep Test Taken",
+                legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="right", x=0.5),
+                margin=dict(t=50, b=70, l=10, r=10),
+            )
             st.plotly_chart(fig, width="stretch")
-
         else:
             st.info("Missing career_goal and/or have_prep_test columns.")
-
+ 
     with col2:
         if "career_goal" in df.columns:
-            cg_counts = df["career_goal"].dropna().astype(str).value_counts().reset_index()
-            cg_counts.columns = ["career_goal", "count"]
-            fig = px.pie(cg_counts, names="career_goal", values="count", hole=0.45)
-            fig.update_layout(title="Career Goal × Prep Test Status")
+            counts = _value_counts_df(df["career_goal"], "career_goal")
+            fig = px.pie(
+                counts, names="career_goal", values="count", hole=0.45,
+                title="Career Goal Distribution",
+                color_discrete_sequence=px.colors.qualitative.Bold,
+            )
+            fig.update_traces(textposition="outside", textinfo="percent+label")
+            fig.update_layout(
+                height=CHART_H,
+                showlegend=False,
+                margin=dict(t=50, b=40, l=60, r=60),
+            )
             st.plotly_chart(fig, width="stretch")
         else:
             st.info("Missing career_goal column.")
-
-    # ===== Section 3 — Learning Profile =====
-    st.subheader("Learning Profile")
-
-    # Exclude zero-variance columns
-    dims_all = ["learn_Q1", "learn_Q2", "learn_Q3", "learn_Q4"]
-    instr_all = ["instruct_Q1", "instruct_Q2", "instruct_Q3", "instruct_Q4", "instruct_Q5", "instruct_Q6"]
-    content_all = ["content_pref_Q1", "content_pref_Q2", "content_pref_Q3"]
-    engage_all = ["engage_Q1", "engage_Q2", "engage_Q3", "engage_Q4"]
-
-    # Map instructional-fit options into numeric profile scale (1 High, 2 Medium, 3 Low, 4 None)
-    # for instruct_Q2 and instruct_Q3.
-    try:
-        from questionnaire_instruct_map import (
-            normalize_instruct_value,
-        )
-
-        for q in ["instruct_Q2", "instruct_Q3"]:
-            if q in df.columns:
-                # Keep both mapped numeric code (for consistent charts) and
-                # a human-readable label (for the Student Responses table).
-                mapped = df[q].apply(normalize_instruct_value)
-
-                # Replace the original column values with the human-readable labels
-                # so the table keeps the same column name (instruct_Q2 / instruct_Q3)
-                # but shows High/Medium/Low/None.
-                df[q] = mapped.map({1: "High", 2: "Medium", 3: "Low", 4: "None"})
-
-    except Exception:
-        # If mapping module isn't available for some reason, keep original values.
-        pass
-    
-    # learn_dims = [c for c in dims_all if c in df.columns and c not in ZERO_VARIANCE_COLS]
-    # We will build flow as: learn_Q1 (prefer), instruct_Q1, content_pref_Q1, engage_Q1
-    # flow_dims = [
-    #     "learn_Q1" if "learn_Q1" in df.columns else None,
-    #     "instruct_Q1" if "instruct_Q1" in df.columns else None,
-    #     "content_pref_Q1" if "content_pref_Q1" in df.columns else None,
-    #     "engage_Q1" if "engage_Q1" in df.columns else None,
-    # ]
-    # flow_dims = [d for d in flow_dims if d is not None and d not in ZERO_VARIANCE_COLS]
-
-    # if len(flow_dims) >= 3:
-    #     # parallel_categories expects at least 2 dimensions
-    #     color_col = "career_goal" if "career_goal" in df.columns else None
-    #     tmp = df[flow_dims + ([color_col] if color_col else [])].dropna().copy()
-    #     if not tmp.empty:
-    #         tmp[color_col] = tmp[color_col].astype(str)
-    #         # Using codes like idea.md, but only if we have a color column.
-    #         color_codes = tmp[color_col].astype("category").cat.codes if color_col else None
-
-    #         fig_pc = px.parallel_categories(
-    #             tmp,
-    #             dimensions=flow_dims,
-    #             color=color_codes,
-    #             color_continuous_scale=px.colors.sequential.Inferno,
-    #         )
-    #         fig_pc.update_layout(title="Learning Profile Flow")
-    #         st.plotly_chart(fig_pc, width="stretch")
-
-    # Heatmap: question × response frequency (as %)
-    heat_questions = [
-        "learn_Q1",
-        "learn_Q2",
-        "instruct_Q1",
-        "instruct_Q5",
-        "instruct_Q6",
-        "content_pref_Q1",
-        "engage_Q1",
-        "engage_Q2",
-        "commit_Q2",
-    ]
-    heat_questions = [q for q in heat_questions if q in df.columns and q not in ZERO_VARIANCE_COLS]
-
-    if heat_questions:
-        matrix = []
-        col_labels = []
-        for q in heat_questions:
-            vc = df[q].dropna().astype(str).value_counts(normalize=True)
-            if vc.empty:
-                continue
-            # Make a consistent column set across questions
-            for opt in vc.index.tolist():
-                if opt not in col_labels:
-                    col_labels.append(opt)
-        # Build matrix in col_labels order
-        for q in heat_questions:
-            vc = df[q].dropna().astype(str).value_counts(normalize=True)
-            row = [float(vc.get(opt, 0.0)) * 100 for opt in col_labels]
-            matrix.append(row)
-
-        if matrix:
-            fig_hm = px.imshow(
-                matrix,
-                x=col_labels,
-                y=heat_questions,
-                text_auto=True,
-                aspect="auto",
-                color_continuous_scale="YlOrRd",
-                labels={"x": "Response Option", "y": "Question", "color": "% of Students"},
-            )
-            fig_hm.update_layout(title="Response Frequency Heatmap", height=400)
-            st.plotly_chart(fig_hm, width="stretch")
-
+ 
     st.markdown("---")
-
-    # ===== Section 4 — Engagement & Commitment =====
+ 
+    # ─── Section 3 — Learning Profile (redesigned) ───────────────────────────
+    st.subheader("Learning Profile")
+ 
+    # 3A: full-width stacked bar — how students seek answers
+    _render_seek_answers_bar(df)
+ 
+    st.markdown(" ")  # visual spacer
+ 
+    # 3B (left) + 3C (right) — teaching style bubble | content+activity donuts
+    col_b, col_c = st.columns(2)
+    with col_b:
+        _render_teaching_style_bubble(df)
+    with col_c:
+        _render_content_engage_donuts(df)
+ 
+    st.markdown("---")
+ 
+    # ─── Section 4 — Engagement & Commitment ─────────────────────────────────
     st.subheader("Engagement & Commitment")
-
-    col1, col2 = st.columns([1, 1])
-
+ 
+    col1, col2 = st.columns(2)
+ 
     with col1:
-        if "engage_Q3" in df.columns and "engage_Q3" not in ZERO_VARIANCE_COLS:
-            counts = df["engage_Q3"].dropna().astype(str).value_counts().reset_index()
-            counts.columns = ["engage_Q3", "count"]
+        if "engage_Q3" in df.columns:
+            counts = _value_counts_df(df["engage_Q3"], "engage_Q3")
             fig = px.bar(
-                counts,
-                x="count",
-                y="engage_Q3",
+                counts, x="count", y="engage_Q3",
                 orientation="h",
-                color="count",
-                color_continuous_scale="Viridis",
-                title="What Motivates Engagement",
+                color="count", color_continuous_scale="Viridis",
+                title="What motivates students to engage?",
+                labels={"engage_Q3": "", "count": "Students"},
             )
-            fig.update_layout(yaxis_title="Engagement Factor", xaxis_title="Number of Students")
+            fig.update_layout(
+                height=CHART_H,
+                xaxis_title="Number of Students",
+                coloraxis_showscale=False,
+                margin=dict(t=50, b=20, l=10, r=10),
+            )
             st.plotly_chart(fig, width="stretch")
         else:
             st.info("Missing engage_Q3 column.")
-
+ 
     with col2:
-        if "commit_Q2" in df.columns and "commit_Q2" not in ZERO_VARIANCE_COLS:
-            counts = df["commit_Q2"].dropna().astype(str).value_counts().reset_index()
-            counts.columns = ["commit_Q2", "count"]
-            fig = px.pie(counts, names="commit_Q2", values="count", hole=0.45)
-            fig.update_layout(title="Barriers to Commitment")
+        if "commit_Q2" in df.columns:
+            counts = _value_counts_df(df["commit_Q2"], "commit_Q2")
+            fig = px.pie(
+                counts, names="commit_Q2", values="count", hole=0.45,
+                title="What blocks students from committing?",
+                color_discrete_sequence=px.colors.qualitative.Safe,
+            )
+            fig.update_traces(textposition="outside", textinfo="percent+label")
+            fig.update_layout(
+                height=CHART_H,
+                showlegend=False,
+                margin=dict(t=50, b=40, l=60, r=60),
+            )
             st.plotly_chart(fig, width="stretch")
-
         else:
             st.info("Missing commit_Q2 column.")
-
+ 
+    # Second row: stacked bar full width
     if all(c in df.columns for c in ["engage_Q1", "engage_Q4"]):
-        tmp = df[["engage_Q1", "engage_Q4"]].dropna().copy()
+        tmp = df[["engage_Q1", "engage_Q4"]].dropna().astype(str).copy()
         if not tmp.empty:
-            fig_stack = px.bar(tmp, x="engage_Q1", color="engage_Q4", barmode="stack")
-            fig_stack.update_layout(title="Engagement Frequency × Prep Test Status")
-            st.plotly_chart(fig_stack, width="stretch")
-
-    # ===== Data table (Raw STUDENT_DATA) =====
-    st.subheader("Student Responses (Filtered)")
-
-    # Remove zero-variance columns and score-related columns (scores only exist in classification view)
-    cols_to_drop = set(DF_COLS_TO_DROP)
-    # Show human-readable labels instead of numeric codes in the table.
-    for q in ["instruct_Q2", "instruct_Q3"]:
-        if f"{q}_label" in df.columns:
-            cols_to_drop.add(q)
-
-    score_cols = {
-        "quant_score",
-        "logic_score",
-        "verbal_score",
-        "final_score",
-        "created_at",
+            fig = px.bar(
+                tmp, x="engage_Q1", color="engage_Q4", barmode="stack",
+                title="Preferred activity style vs what students want added to sessions",
+                color_discrete_sequence=px.colors.qualitative.Pastel,
+                labels={"engage_Q1": "", "engage_Q4": "Wants Added"},
+            )
+            fig.update_layout(
+                height=CHART_H,
+                yaxis_title="Number of Students",
+                legend_title_text="What they want added",
+                legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5),
+                margin=dict(t=50, b=80, l=10, r=10),
+            )
+            st.plotly_chart(fig, width="stretch")
+ 
+    st.markdown("---")
+ 
+    # ─── Data Table ───────────────────────────────────────────────────────────
+    st.subheader("Student Responses")
+ 
+    cols_to_drop = set(DF_COLS_TO_DROP) | {
+        "quant_score", "logic_score", "verbal_score", "final_score", "created_at"
     }
-    cols_to_drop |= score_cols
-
-    table_df = df.copy()
-    existing_drop = [c for c in cols_to_drop if c in table_df.columns]
-    if existing_drop:
-        table_df = table_df.drop(columns=existing_drop)
-
-    # Put identity columns first if present
+    table_df = df.drop(columns=[c for c in cols_to_drop if c in df.columns])
+ 
     identity_order = [
-        "student_id",
-        "student_name",
-        "college_name",
-        "department",
-        "course_type",
-        "year",
-        "medium",
+        "student_id", "student_name", "college_name", "department",
+        "course_type", "year", "medium",
     ]
     ordered = [c for c in identity_order if c in table_df.columns]
-    rest = [c for c in table_df.columns if c not in ordered]
+    rest    = [c for c in table_df.columns if c not in ordered]
     table_df = table_df[ordered + rest]
-
-    # ===== Search / Filter table (Student ID) =====
-
-    if "student_id" in df.columns:
-        table_df_for_search = table_df.copy()
-        table_df_for_search["student_id"] = table_df_for_search["student_id"].fillna("").astype(str)
-        student_ids = sorted(table_df_for_search["student_id"].drop_duplicates().dropna().unique().tolist())
-
-        if student_ids:
-            def _format_student_id(x):
-                s = str(x).strip()
-                if len(s) <= 8:
-                    return s
-                return s[:8] + "..." + s[-4:]
-
-            search_col1, search_col2 = st.columns([4, 1])
-            with search_col1:
-                selected_student_id = st.selectbox(
-                    "🔍 Filter by Student ID",
-                    options=student_ids,
-                    index=0,
-                    format_func=_format_student_id,
-                )
-            with search_col2:
-                show_expander = st.checkbox("👤 Show", value=True)
-
-            if show_expander:
-                st.dataframe(
-                    table_df_for_search[table_df_for_search["student_id"] == str(selected_student_id)].reset_index(
-                        drop=True
-                    ),
-                    width="stretch",
-                )
-            else:
-                st.dataframe(table_df_for_search.reset_index(drop=True), width="stretch")
+ 
+    if "student_id" in table_df.columns:
+        table_df["student_id"] = table_df["student_id"].fillna("").astype(str)
+        student_ids = sorted(table_df["student_id"].drop_duplicates().tolist())
+ 
+        col_sel, col_toggle = st.columns([4, 1])
+        with col_sel:
+            selected_id = st.selectbox("Filter by Student ID", options=student_ids, index=0)
+        with col_toggle:
+            show_one = st.checkbox("Show one", value=True)
+ 
+        if show_one:
+            st.dataframe(
+                table_df[table_df["student_id"] == selected_id].reset_index(drop=True),
+                width="stretch",
+            )
         else:
             st.dataframe(table_df.reset_index(drop=True), width="stretch")
     else:
         st.dataframe(table_df.reset_index(drop=True), width="stretch")
+ 
