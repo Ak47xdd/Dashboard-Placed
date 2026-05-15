@@ -48,7 +48,6 @@ def normalize_instruct_value(x):
     except Exception:
         pass
 
-
     # Match option labels (case-insensitive)
     for k, v in INSTRUCT_Q2_MAP.items():
         if s.lower() == k.lower():
