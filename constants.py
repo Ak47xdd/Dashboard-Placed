@@ -1,6 +1,5 @@
 # All application constants should be defined here
 
-
 REFRESH_SECONDS = 30
 
 # Toggle data source:
