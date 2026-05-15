@@ -75,6 +75,10 @@ def sync_CLASS_csv_to_supabase():
         print("Successfully synced CLASSIFICATION data!")
     else:
         print(f"Error: {res.status_code} - {res.text}")
+        
+@app.get("/cron-task")
+def cron_job():
+    return {"Cron job complete, next one in 10 minutes"}
 
 @app.post("/form/submit-profile")
 async def submit_profile(form_data: dict):
