@@ -60,7 +60,6 @@ def sync_CLASS_csv_to_supabase():
 
     records = df.to_dict(orient='records')
 
-    
     headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
