@@ -9,7 +9,7 @@ USE_CSV = False
 
 MAIN_CSV = "STUDENTS - Sheet1"
 CSV_FILE = "CLASSIFICATIONS - Sheet1 (1).csv"
-3
-# Table schema provided by you: public."CLASSIFICATION"
+
+# Table schema provided by supabase: public."CLASSIFICATION" & public."STUDENT_DATA"
 SUPA_DB = "CLASSIFICATION"
 SUPA_RAW_DB = "STUDENT_DATA"
