@@ -21,39 +21,38 @@ A Streamlit-based data analytics dashboard for tracking student placement data. 
 
 ## Tech Stack
 
-| Category        | Technology                                     |
-| --------------- | ---------------------------------------------- |
-| Frontend        | [Streamlit](https://streamlit.io/)             |
-| Data Processing | [Pandas](https://pandas.pydata.org/)           |
-| Visualizations  | [Plotly](https://plotly.com/python/)           |
-| Data Source     | [Google Sheets](https://www.google.com/sheets) |
-| API Integration | [gspread](https://gspread.readthedocs.io/)     |
-| Authentication  | Google OAuth2                                  |
+| Category        | Technology                                                              |
+| --------------- | ----------------------------------------------------------------------- |
+| Frontend        | [Streamlit](https://streamlit.io/)                                      |
+| Data Processing | [Pandas](https://pandas.pydata.org/)                                    |
+| Visualizations  | [Plotly](https://plotly.com/python/)                                    |
+| Data Source     | [Supabase](https://supabase.com/) (default) / Local CSV (optional)      |
+| API Integration | Supabase REST (no external supabase SDK)                                |
+| Authentication  | Supabase JWT via environment variables (`SUPABASE_URL`, `SUPABASE_KEY`) |
 
 ---
 
-## Project Structure
+## Project Structure (current)
 
 ```
 Dashboard-Placed/
-├── app.py                 # Main application entry point
-├── client.py             # Google Sheets client configuration
-├── constants.py          # Application constants and settings
+├── app.py               # Main application entry point
+├── client.py            # Google Sheets client configuration
+├── constants.py         # Application constants and settings
 ├── filter.py            # Filter and visualization logic
 ├── requirements.txt     # Python dependencies
 ├── README.md            # Project documentation
 ├── .gitignore           # Git ignore rules
 ├── data/
 │   ├── __init__.py
-│   ├── data.py          # Data loading and processing
-│   └── Placed_Dashboard - Form responses 1.csv  # Sample data
+│   └──  data.py         # Data loading and processing
 ├── frontend/
 │   ├── __init__.py
 │   ├── bg.py            # Background image configuration
 │   └── styles.py        # Custom CSS styling
 └── Resources/
-    ├── Placed_base64.txt    # Base64 encoded background image
-    └── Placed.jpg          # Background image source
+    ├── Placed_base64.txt# Base64 encoded background image
+    └── Placed.jpg       # Background image source
 ```
 
 ---
@@ -63,8 +62,10 @@ Dashboard-Placed/
 ### Prerequisites
 
 - Python 3.8 or higher
-- Google Cloud service account credentials
-- Google Sheets API enabled
+- Supabase project (default data source)
+- Set environment variables `SUPABASE_URL` and `SUPABASE_KEY`
+
+> Local CSV testing is supported by setting `USE_CSV = True` in `constants.py`.
 
 ### Installation
 
@@ -91,23 +92,22 @@ Dashboard-Placed/
 
    (OPTIONAL)
 
-4. Configure Google Sheets:
-   - Go to [Google Cloud Console](https://console.cloud.google.com/)
-   - Create a new project
-   - Enable Google Sheets API and Google Drive API
-   - Create a service account and download the JSON credentials
-   - Rename the credentials file to `service_key.json`
-   - Share your Google Sheet with the service account email
+4. Configure Supabase (required when `USE_CSV = False`):
+   - Set `SUPABASE_URL` and `SUPABASE_KEY` as environment variables
+   - Ensure the Supabase tables exist and match `constants.py`:
+     - `CLASSIFICATION` (aggregated dashboard data)
+     - `STUDENT_DATA` (raw student/evaluation data)
 
 5. Configure constants:
    Edit `constants.py` to match your configuration:
    ```python
-   SHEET_NAME = "Your_Sheet_Name"
-   WORKSHEET_INDEX = 0
    REFRESH_SECONDS = 30
-   (RECOMMENDED FOR TESTING)
    USE_CSV = False  # Set to True for local testing
    ```
+
+# When using Supabase (USE_CSV=False):
+
+# SUPA_DB and SUPA_RAW_DB default to "CLASSIFICATION" and "STUDENT_DATA"
 
 ### Running the Application
 
@@ -123,20 +123,21 @@ The dashboard will open in your browser at `http://localhost:8501`.
 
 ### Constants in `constants.py`
 
-| Constant          | Description                            | Default Value                               |
-| ----------------- | -------------------------------------- | ------------------------------------------- |
-| `SHEET_NAME`      | Name of the Google Sheet               | `"Placed_Dashboard"`                        |
-| `WORKSHEET_INDEX` | Index of the worksheet (0-indexed)     | `0`                                         |
-| `REFRESH_SECONDS` | Auto-refresh interval in seconds       | `30`                                        |
-| `USE_CSV`         | Use local CSV instead of Google Sheets | `False` or `True` for Local Tests           |
-| `CSV_FILE`        | Path to local CSV file                 | `"Placed_Dashboard - Form responses 1.csv"` |
+| Constant          | Description                                 | Default                              |
+| ----------------- | ------------------------------------------- | ------------------------------------ |
+| `REFRESH_SECONDS` | Auto-refresh interval (seconds)             | `30`                                 |
+| `USE_CSV`         | Toggle data source (local CSV vs Supabase)  | `False`                              |
+| `MAIN_CSV`        | Local CSV base name for student data        | `"STUDENTS - Sheet1"`                |
+| `CSV_FILE`        | Local CSV base name for classification data | `"CLASSIFICATIONS - Sheet1 (1).csv"` |
+| `SUPA_DB`         | Supabase table for classification           | `"CLASSIFICATION"`                   |
+| `SUPA_RAW_DB`     | Supabase table for raw student data         | `"STUDENT_DATA"`                     |
 
-### Local Development Mode
+### Local Development Mode (CSV)
 
 To test with local CSV data:
 
 1. Set `USE_CSV = True` in `constants.py`
-2. Ensure the CSV file exists in the `data/` directory
+2. Ensure the CSV files exist in the `data/` directory
 3. Run `streamlit run app.py`
 
 ---
@@ -200,17 +201,16 @@ The Google Sheet/CSV should contain the following columns:
 
 ### Common Issues
 
-1. Authentication Error
-   - Ensure `service_key.json` is in the project root
-   - Verify the service account has access to the Google Sheet
+1. Supabase authentication error
+   - Ensure `SUPABASE_URL` and `SUPABASE_KEY` are set in your environment
+   - Verify the Supabase project/table access permissions
 
 2. Data Not Loading
-   - Check column names match the expected format
-   - Verify the worksheet index is correct
+   - Check column names/types match what the dashboard expects
+   - Verify your Supabase tables (or local CSVs) are populated
 
-3. Auto-Refresh Not Working
-   - The meta refresh may be blocked by some browsers
-   - Use the manual refresh button as an alternative
+3. Auto-refresh not working
+   - Use the manual “Refresh” button in the app (browser restrictions may limit background refresh)
 
 ---
 
@@ -223,7 +223,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - [Streamlit](https://streamlit.io/) for the excellent web framework
-- [gspread](https://gspread.readthedocs.io/) for Google Sheets integration
+
 - [Plotly](https://plotly.com/python/) for interactive visualizations
 
 ---
