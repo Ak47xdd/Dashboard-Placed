@@ -5,7 +5,7 @@ import plotly.graph_objects as go
  
 from college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_CANONICAL_MAP
  
-# ─── Constants ────────────────────────────────────────────────────────────────
+# =============== Constants ===============
  
 ZERO_VARIANCE_COLS = [
     "learn_Q3",
@@ -28,27 +28,41 @@ DF_COLS_TO_DROP = [
 # Consistent chart height used across every figure so rows align
 CHART_H = 400
  
-# ─── Helpers ──────────────────────────────────────────────────────────────────
+# Build lowercase lookup maps once at module load — not inside every call
+_COLLEGE_LOWER_MAP = {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.items()}
+_DEPT_LOWER_MAP    = {k.lower(): v for k, v in DEPARTMENT_VARIANT_CANONICAL_MAP.items()}
  
-def _normalize(df: pd.DataFrame) -> pd.DataFrame:
-    out = df.copy()
-    if "college_name" in out.columns and COLLEGE_VARIANT_CANONICAL_MAP:
-        s = out["college_name"].fillna("").astype(str).str.strip()
-        cn_map = {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.items()}
-        s_lower = s.str.lower()
-        for wrong, canonical in cn_map.items():
-            s.loc[s_lower.eq(wrong)] = canonical
-        out["college_name"] = s
  
-    if "department" in out.columns and DEPARTMENT_VARIANT_CANONICAL_MAP:
-        s = out["department"].fillna("").astype(str).str.strip()
-        dn_map = {k.lower(): v for k, v in DEPARTMENT_VARIANT_CANONICAL_MAP.items()}
-        s_lower = s.str.lower()
-        for wrong, canonical in dn_map.items():
-            s.loc[s_lower.eq(wrong)] = canonical
-        out["department"] = s
+# =============== Helpers ===============
  
-    return out
+def _normalize_college_name(series: pd.Series) -> pd.Series:
+    """Normalize a college_name series using the module-level canonical map."""
+    if series is None:
+        return series
+    s = series.fillna("").astype(str).str.strip()
+    if not _COLLEGE_LOWER_MAP:
+        return s
+    s_lower = s.str.lower()
+    for wrong_lower, canonical in _COLLEGE_LOWER_MAP.items():
+        mask = s_lower.eq(wrong_lower)
+        if mask.any():
+            s.loc[mask] = canonical
+    return s
+ 
+ 
+def _normalize_dept_name(series: pd.Series) -> pd.Series:
+    """Normalize a department series using the module-level canonical map."""
+    if series is None:
+        return series
+    s = series.fillna("").astype(str).str.strip()
+    if not _DEPT_LOWER_MAP:
+        return s
+    s_lower = s.str.lower()
+    for wrong_lower, canonical in _DEPT_LOWER_MAP.items():
+        mask = s_lower.eq(wrong_lower)
+        if mask.any():
+            s.loc[mask] = canonical
+    return s
  
  
 def _value_counts_df(series: pd.Series, name: str) -> pd.DataFrame:
@@ -57,7 +71,7 @@ def _value_counts_df(series: pd.Series, name: str) -> pd.DataFrame:
     return vc
  
  
-# ─── Section 3 sub-renderers ─────────────────────────────────────────────────
+# =============== Section 3 sub-renderers ===============
  
 def _render_seek_answers_bar(df: pd.DataFrame) -> None:
     """
@@ -115,7 +129,7 @@ def _render_teaching_style_bubble(df: pd.DataFrame) -> None:
     Color = feedback timing preference (instruct_Q5)
  
     Answers: 'What teaching style fits them?'
-    A teacher reads this in seconds — bigger bubbles = where most students cluster.
+    Bigger bubbles = where most students cluster.
     """
     needed = ["instruct_Q1", "instruct_Q6"]
     if not all(c in df.columns for c in needed):
@@ -138,7 +152,6 @@ def _render_teaching_style_bubble(df: pd.DataFrame) -> None:
         st.info("Not enough data for teaching style chart.")
         return
  
-    # Enforce a readable confidence order on y-axis
     confidence_order = ["Low", "Medium", "High"]
     agg["instruct_Q6"] = pd.Categorical(
         agg["instruct_Q6"], categories=confidence_order, ordered=True
@@ -178,11 +191,10 @@ def _render_teaching_style_bubble(df: pd.DataFrame) -> None:
 def _render_content_engage_donuts(df: pd.DataFrame) -> None:
     """
     Chart 3C — Two small donuts stacked vertically inside a single column.
-    Top donut:    content_pref_Q1 — preferred content format
-    Bottom donut: engage_Q1       — preferred activity style
+    Top:    content_pref_Q1 — preferred content format
+    Bottom: engage_Q1       — preferred activity style
  
     Answers: 'What content and activities do they prefer?'
-    Pure part-of-whole — nothing to trace, no axes to read.
     Sits in the right column next to Chart 3B.
     """
     left_col  = "content_pref_Q1"
@@ -226,14 +238,17 @@ def _render_content_engage_donuts(df: pd.DataFrame) -> None:
         st.plotly_chart(fig, width="stretch")
  
  
-# ─── Main render ──────────────────────────────────────────────────────────────
+# =============== Main render ===============
  
 def render_student_tab(df: pd.DataFrame) -> None:
     if df is None or df.empty:
         st.info("No student data available.")
         return
-
-    # Session state defaults for College & Program Filters (port from filter.py)
+ 
+    # df arrives already normalized from db_queries.fetch_student_raw_df()
+    # No _normalize() call needed here.
+ 
+    # Session state defaults
     defaults = {
         'selected_colleges': [],
         'custom_college': '',
@@ -245,67 +260,35 @@ def render_student_tab(df: pd.DataFrame) -> None:
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
-
-    def _normalize_college_name(series):
-        """Normalize college_name using COLLEGE_VARIANT_CANONICAL_MAP (unified dictionary)."""
-        if series is None:
-            return series
-        s = series.fillna("").astype(str).str.strip()
-        if not COLLEGE_VARIANT_CANONICAL_MAP:
-            return s
-        s_lower = s.astype(str).str.strip().str.lower()
-        for wrong_lower, canonical in {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.items()}.items():
-            mask = s_lower.eq(wrong_lower)
-            if mask.any():
-                s.loc[mask] = canonical
-        return s
-
-    def _normalize_dept_name(series):
-        if series is None:
-            return series
-        s = series.fillna("").astype(str).str.strip()
-        if not DEPARTMENT_VARIANT_CANONICAL_MAP:
-            return s
-        s_lower = s.astype(str).str.strip().str.lower()
-        for wrong_lower, canonical in {k.lower(): v for k, v in DEPARTMENT_VARIANT_CANONICAL_MAP.items()}.items():
-            mask = s_lower.eq(wrong_lower)
-            if mask.any():
-                s.loc[mask] = canonical
-        return s
-
-    df = _normalize(df)
-
-    # College & Program Filters (port UI + logic from filter.py)
+ 
+    # =============== Filters ===============
     st.markdown(
         """
         <div class="main-filter-section">
-            <h2 class="main-filter-title"> College & Program Filters</h2>
+            <h2 class="main-filter-title">College & Program Filters</h2>
             <p class="filter-subtitle">Select colleges, departments, years or type custom values. Leave empty to show all.</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
-
+ 
     filter_container = st.container()
     with filter_container:
         col1, col2, col3 = st.columns(3)
-
+ 
         with col1:
             colleges = (
                 sorted(df['college_name'].dropna().unique().tolist())
-                if 'college_name' in df.columns
-                else []
+                if 'college_name' in df.columns else []
             )
             colleges = [_normalize_college_name(pd.Series([c])).iloc[0] for c in colleges]
-
+ 
             selected_colleges = st.multiselect(
-                "Colleges",
-                colleges,
+                "Colleges", colleges,
                 default=st.session_state.get('selected_colleges', []),
                 key='college_multiselect',
                 help="Click dropdown or type to search colleges",
             )
-
             custom_college = st.text_input(
                 "Custom college name",
                 value=st.session_state.get('custom_college', ''),
@@ -313,59 +296,51 @@ def render_student_tab(df: pd.DataFrame) -> None:
                 placeholder="Type exact name e.g., 'New College'",
                 help="Filters students from exactly this college name",
             )
-
             if custom_college.strip():
                 custom_college = _normalize_college_name(pd.Series([custom_college])).iloc[0]
-
             if isinstance(selected_colleges, list):
                 selected_colleges = [_normalize_college_name(pd.Series([c])).iloc[0] for c in selected_colleges]
                 st.session_state['selected_colleges'] = selected_colleges
-
+ 
         with col2:
             depts = (
                 sorted(df['department'].dropna().unique().tolist())
-                if 'department' in df.columns
-                else []
+                if 'department' in df.columns else []
             )
             selected_depts = st.multiselect(
-                "Department",
-                depts,
+                "Department", depts,
                 default=st.session_state.get('selected_depts', []),
                 key='dept_multiselect',
                 help="Click dropdown or type to search departments",
             )
-
             custom_dept = st.text_input(
                 "Custom department",
                 value=st.session_state.get('custom_dept', ''),
                 key='custom_dept_input',
                 placeholder="e.g., 'BTech CS', 'MCA'",
             )
-
+ 
         with col3:
             years = (
                 sorted(df['year'].dropna().unique().tolist())
-                if 'year' in df.columns
-                else []
+                if 'year' in df.columns else []
             )
             selected_years = st.multiselect(
-                "🎥 Year",
-                years,
+                "Year", years,
                 default=st.session_state.get('selected_years', []),
                 key='year_multiselect',
                 help="Click dropdown or type year numbers",
             )
-
             custom_year = st.text_input(
                 "Custom year",
                 value=st.session_state.get('custom_year', ''),
                 key='custom_year_input',
                 placeholder="e.g., '1', '4'",
             )
-
-    # Apply categorical filters (case-insensitive partial match)
+ 
+    # Apply filters
     filtered_df = df.copy()
-
+ 
     all_colleges = list(selected_colleges) if isinstance(selected_colleges, list) else []
     if isinstance(custom_college, str) and custom_college.strip():
         all_colleges.append(custom_college.strip())
@@ -373,7 +348,7 @@ def render_student_tab(df: pd.DataFrame) -> None:
         filtered_df = filtered_df[
             filtered_df['college_name'].str.contains('|'.join(all_colleges), case=False, na=False)
         ]
-
+ 
     all_depts = list(selected_depts) if isinstance(selected_depts, list) else []
     if isinstance(custom_dept, str) and custom_dept.strip():
         custom_dept = _normalize_dept_name(pd.Series([custom_dept])).iloc[0]
@@ -382,7 +357,7 @@ def render_student_tab(df: pd.DataFrame) -> None:
         filtered_df = filtered_df[
             filtered_df['department'].str.contains('|'.join(all_depts), case=False, na=False)
         ]
-
+ 
     all_years_str = [str(y) for y in selected_years] if isinstance(selected_years, list) else []
     if isinstance(custom_year, str) and custom_year.strip():
         all_years_str.append(custom_year.strip())
@@ -390,21 +365,16 @@ def render_student_tab(df: pd.DataFrame) -> None:
         filtered_df = filtered_df[
             filtered_df['year'].astype(str).str.contains('|'.join(all_years_str), case=False, na=False)
         ]
-
+ 
+    # Filter summary
     filter_summary = []
     if selected_colleges or (isinstance(custom_college, str) and custom_college.strip()):
-        filter_summary.append(
-            f"College: {', '.join(selected_colleges[:2])}{'...' if len(selected_colleges)>2 else ''}{' + custom' if (isinstance(custom_college, str) and custom_college.strip()) else ''}"
-        )
+        filter_summary.append(f"College: {', '.join(selected_colleges[:2])}{'...' if len(selected_colleges)>2 else ''}{' + custom' if (isinstance(custom_college, str) and custom_college.strip()) else ''}")
     if selected_depts or (isinstance(custom_dept, str) and custom_dept.strip()):
-        filter_summary.append(
-            f"Dept: {', '.join(selected_depts[:2])}{'...' if len(selected_depts)>2 else ''}{' + custom' if (isinstance(custom_dept, str) and custom_dept.strip()) else ''}"
-        )
+        filter_summary.append(f"Dept: {', '.join(selected_depts[:2])}{'...' if len(selected_depts)>2 else ''}{' + custom' if (isinstance(custom_dept, str) and custom_dept.strip()) else ''}")
     if selected_years or (isinstance(custom_year, str) and custom_year.strip()):
-        filter_summary.append(
-            f"Year: {', '.join(map(str, selected_years[:2]))}{'...' if len(selected_years)>2 else ''}{' + custom' if (isinstance(custom_year, str) and custom_year.strip()) else ''}"
-        )
-
+        filter_summary.append(f"Year: {', '.join(map(str, selected_years[:2]))}{'...' if len(selected_years)>2 else ''}{' + custom' if (isinstance(custom_year, str) and custom_year.strip()) else ''}")
+ 
     col_summary1, col_summary2 = st.columns([3, 1])
     with col_summary1:
         st.markdown(
@@ -418,30 +388,26 @@ def render_student_tab(df: pd.DataFrame) -> None:
         )
     with col_summary2:
         if st.button("Clear All Filters", key="clear_filters_btn"):
-            st.session_state['selected_colleges'] = []
-            st.session_state['custom_college'] = ''
-            st.session_state['selected_depts'] = []
-            st.session_state['custom_dept'] = ''
-            st.session_state['selected_years'] = []
-            st.session_state['custom_year'] = ''
+            for k in ['selected_colleges', 'custom_college', 'selected_depts',
+                      'custom_dept', 'selected_years', 'custom_year']:
+                st.session_state[k] = [] if k.startswith('selected') else ''
             st.rerun()
-
+ 
     if filtered_df.empty:
         st.warning("No students match your filters!")
         st.info("Leave dropdowns empty to show all students, or check your custom text spelling.")
         st.stop()
-
+ 
     st.session_state.selected_colleges = selected_colleges
-    st.session_state.custom_college = custom_college if isinstance(custom_college, str) else ''
-    st.session_state.selected_depts = selected_depts
-    st.session_state.custom_dept = custom_dept if isinstance(custom_dept, str) else ''
-    st.session_state.selected_years = selected_years
-    st.session_state.custom_year = custom_year if isinstance(custom_year, str) else ''
-
+    st.session_state.custom_college    = custom_college if isinstance(custom_college, str) else ''
+    st.session_state.selected_depts    = selected_depts
+    st.session_state.custom_dept       = custom_dept if isinstance(custom_dept, str) else ''
+    st.session_state.selected_years    = selected_years
+    st.session_state.custom_year       = custom_year if isinstance(custom_year, str) else ''
+ 
     df = filtered_df
-
-    # ─── KPI Row ──────────────────────────────────────────────────────────────
-
+ 
+    # =============== KPI Row ===============
     placement_pct = 0.0
     if "career_goal" in df.columns:
         placement_pct = (
@@ -449,14 +415,14 @@ def render_student_tab(df: pd.DataFrame) -> None:
         )
  
     k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Total Students",    len(df))
-    k2.metric("Colleges",          df["college_name"].nunique() if "college_name" in df.columns else "-")
-    k3.metric("Departments",        df["department"].nunique()   if "department"   in df.columns else "-")
-    k4.metric("In-Campus Placement Seekers",  f"{placement_pct:.0f}%")
+    k1.metric("Total Students",           len(df))
+    k2.metric("Colleges",                 df["college_name"].nunique() if "college_name" in df.columns else "-")
+    k3.metric("Departments",              df["department"].nunique()   if "department"   in df.columns else "-")
+    k4.metric("In-Campus Placement Seekers", f"{placement_pct:.0f}%")
  
     st.markdown("---")
  
-    # ─── Section 1 — Who Are They? ────────────────────────────────────────────
+    # =============== Section 1 — Who Are They? ===============
     st.subheader("Student Demographics & Background")
  
     col1, col2 = st.columns([2, 1])
@@ -469,10 +435,7 @@ def render_student_tab(df: pd.DataFrame) -> None:
                 color_discrete_sequence=px.colors.qualitative.Pastel,
                 title="College → Department → Year Distribution",
             )
-            fig.update_layout(
-                height=CHART_H,
-                margin=dict(t=40, b=10, l=10, r=10),
-            )
+            fig.update_layout(height=CHART_H, margin=dict(t=40, b=10, l=10, r=10))
             st.plotly_chart(fig, width="stretch")
         else:
             st.info("Missing college_name / department / year columns.")
@@ -498,7 +461,7 @@ def render_student_tab(df: pd.DataFrame) -> None:
  
     st.markdown("---")
  
-    # ─── Section 2 — Goals & Readiness ───────────────────────────────────────
+    # =============== Section 2 — Goals & Readiness ===============
     st.subheader("Goals & Readiness")
  
     col1, col2 = st.columns(2)
@@ -534,8 +497,7 @@ def render_student_tab(df: pd.DataFrame) -> None:
             )
             fig.update_traces(textposition="outside", textinfo="percent+label")
             fig.update_layout(
-                height=CHART_H,
-                showlegend=False,
+                height=CHART_H, showlegend=False,
                 margin=dict(t=50, b=40, l=60, r=60),
             )
             st.plotly_chart(fig, width="stretch")
@@ -544,15 +506,12 @@ def render_student_tab(df: pd.DataFrame) -> None:
  
     st.markdown("---")
  
-    # ─── Section 3 — Learning Profile (redesigned) ───────────────────────────
+    # =============== Section 3 — Learning Profile ===============
     st.subheader("Learning Profile")
  
-    # 3A: full-width stacked bar — how students seek answers
     _render_seek_answers_bar(df)
+    st.markdown(" ")
  
-    st.markdown(" ")  # visual spacer
- 
-    # 3B (left) + 3C (right) — teaching style bubble | content+activity donuts
     col_b, col_c = st.columns(2)
     with col_b:
         _render_teaching_style_bubble(df)
@@ -561,7 +520,7 @@ def render_student_tab(df: pd.DataFrame) -> None:
  
     st.markdown("---")
  
-    # ─── Section 4 — Engagement & Commitment ─────────────────────────────────
+    # =============== Section 4 — Engagement & Commitment ===============
     st.subheader("Engagement & Commitment")
  
     col1, col2 = st.columns(2)
@@ -596,15 +555,13 @@ def render_student_tab(df: pd.DataFrame) -> None:
             )
             fig.update_traces(textposition="outside", textinfo="percent+label")
             fig.update_layout(
-                height=CHART_H,
-                showlegend=False,
+                height=CHART_H, showlegend=False,
                 margin=dict(t=50, b=40, l=60, r=60),
             )
             st.plotly_chart(fig, width="stretch")
         else:
             st.info("Missing commit_Q2 column.")
  
-    # Second row: stacked bar full width
     if all(c in df.columns for c in ["engage_Q1", "engage_Q4"]):
         tmp = df[["engage_Q1", "engage_Q4"]].dropna().astype(str).copy()
         if not tmp.empty:
@@ -625,7 +582,7 @@ def render_student_tab(df: pd.DataFrame) -> None:
  
     st.markdown("---")
  
-    # ─── Data Table ───────────────────────────────────────────────────────────
+    # =============== Data Table ===============
     st.subheader("Student Responses")
  
     cols_to_drop = set(DF_COLS_TO_DROP) | {
@@ -637,8 +594,8 @@ def render_student_tab(df: pd.DataFrame) -> None:
         "student_id", "student_name", "college_name", "department",
         "course_type", "year", "medium",
     ]
-    ordered = [c for c in identity_order if c in table_df.columns]
-    rest    = [c for c in table_df.columns if c not in ordered]
+    ordered  = [c for c in identity_order if c in table_df.columns]
+    rest     = [c for c in table_df.columns if c not in ordered]
     table_df = table_df[ordered + rest]
  
     if "student_id" in table_df.columns:
@@ -660,4 +617,3 @@ def render_student_tab(df: pd.DataFrame) -> None:
             st.dataframe(table_df.reset_index(drop=True), width="stretch")
     else:
         st.dataframe(table_df.reset_index(drop=True), width="stretch")
- 
