@@ -36,19 +36,15 @@ def normalize_instruct_value(x):
     if s == "":
         return None
 
-    # If already numeric scale
-    # Note: CSV may contain values like "Low"/"High" or numeric codes.
     if s in {"1", "2", "3", "4"}:
         return int(s)
 
-    # Sometimes values may come in as numeric in float-like format ("1.0")
     try:
         if float(s).is_integer() and str(int(float(s))) in {"1", "2", "3", "4"}:
             return int(float(s))
     except Exception:
         pass
 
-    # Match option labels (case-insensitive)
     for k, v in INSTRUCT_Q2_MAP.items():
         if s.lower() == k.lower():
             return v
