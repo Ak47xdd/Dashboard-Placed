@@ -64,7 +64,6 @@ def _normalize_dept_name(series: pd.Series) -> pd.Series:
             s.loc[mask] = canonical
     return s
  
- 
 def _value_counts_df(series: pd.Series, name: str) -> pd.DataFrame:
     vc = series.dropna().astype(str).value_counts().reset_index()
     vc.columns = [name, "count"]
