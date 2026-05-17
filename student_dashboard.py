@@ -119,7 +119,6 @@ def _render_seek_answers_bar(df: pd.DataFrame) -> None:
     )
     st.plotly_chart(fig, width="stretch")
  
- 
 def _render_teaching_style_bubble(df: pd.DataFrame) -> None:
     """
     Chart 3B — Bubble matrix.
