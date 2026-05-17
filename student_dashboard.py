@@ -236,8 +236,7 @@ def _render_content_engage_donuts(df: pd.DataFrame) -> None:
             margin=dict(t=40, b=20, l=40, r=40),
         )
         st.plotly_chart(fig, width="stretch")
- 
- 
+
 # =============== Main render ===============
  
 def render_student_tab(df: pd.DataFrame) -> None:
