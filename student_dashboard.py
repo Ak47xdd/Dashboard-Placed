@@ -406,8 +406,21 @@ def render_student_tab(df: pd.DataFrame) -> None:
     st.session_state.custom_year       = custom_year if isinstance(custom_year, str) else ''
  
     df = filtered_df
- 
+
+    # Map instruct_Q2 / instruct_Q3 numeric codes (1..4) to labels.
+    # Dashboard expects High/Medium/Low/None for display/heatmaps.
+    try:
+        from questionnaire_instruct_map import normalize_instruct_value
+
+        inv_map = {1: "High", 2: "Medium", 3: "Low", 4: "None"}
+        for q in ["instruct_Q2", "instruct_Q3"]:
+            if q in df.columns:
+                df[q] = df[q].apply(normalize_instruct_value).map(inv_map)
+    except Exception:
+        pass
+
     # =============== KPI Row ===============
+
     placement_pct = 0.0
     if "career_goal" in df.columns:
         placement_pct = (
