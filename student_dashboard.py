@@ -69,8 +69,7 @@ def _value_counts_df(series: pd.Series, name: str) -> pd.DataFrame:
     vc = series.dropna().astype(str).value_counts().reset_index()
     vc.columns = [name, "count"]
     return vc
- 
- 
+
 # =============== Section 3 sub-renderers ===============
  
 def _render_seek_answers_bar(df: pd.DataFrame) -> None:
