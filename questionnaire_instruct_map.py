@@ -45,7 +45,6 @@ def normalize_instruct_value(x):
     if s in {"1", "2", "3", "4"}:
         return int(s)
 
-
     try:
         if float(s).is_integer() and str(int(float(s))) in {"1", "2", "3", "4"}:
             return int(float(s))
