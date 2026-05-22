@@ -191,7 +191,6 @@ def submit_profile(form_data: dict):
     
     student_res = requests.post(student_endpoint, headers=headers, json=data)
 
-
     # Always surface Supabase response for debugging.
     if student_res.text:
         try:
