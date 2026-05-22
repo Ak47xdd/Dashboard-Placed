@@ -2,12 +2,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import pandas as pd
-import os
 import requests
 from marking import generate_classifications
 from datetime import datetime, timezone
 
-app = FastAPI(title="Profiling Form API")
+app = FastAPI(
+    title="Profiling Form API",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
+    )
 
 app.add_middleware(
     CORSMiddleware,
