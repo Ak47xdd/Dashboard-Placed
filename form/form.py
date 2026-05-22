@@ -217,7 +217,6 @@ def submit_profile(form_data: dict):
 
     inserted = student_res_json if student_res_json is not None else (student_res.text or [])
 
-
     inserted = student_res.json() if student_res.text else []
     # Supabase returns inserted rows when Prefer: return=representation is set.
     inserted_row = None
