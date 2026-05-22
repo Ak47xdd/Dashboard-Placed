@@ -430,7 +430,7 @@ def render_student_tab(df: pd.DataFrame) -> None:
     k4.metric("In-Campus Placement Seekers", f"{placement_pct:.0f}%")
  
     st.markdown("---")
- 
+
     # =============== Section 1 — Who Are They? ===============
     st.subheader("Student Demographics & Background")
  
@@ -448,7 +448,7 @@ def render_student_tab(df: pd.DataFrame) -> None:
             st.plotly_chart(fig, width="stretch")
         else:
             st.info("Missing college_name / department / year columns.")
- 
+
     with col2:
         if "medium" in df.columns:
             counts = _value_counts_df(df["medium"], "medium")
