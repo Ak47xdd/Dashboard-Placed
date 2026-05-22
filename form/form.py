@@ -84,7 +84,7 @@ def cron_job():
     return {"Cron job complete, next one in 10 minutes"}
 
 @app.post("/form/submit-profile")
-async def submit_profile(form_data: dict):
+def submit_profile(form_data: dict):
     """Insert the submitted questionnaire directly into Supabase.
 
     This removes the previous CSV-first behavior.
