@@ -5,7 +5,6 @@ from typing import Any
  
 import requests
  
- 
 class _SupabaseRESTResponse:
     def __init__(self, data: Any):
         self.data = data
