@@ -41,7 +41,7 @@ class _SupabaseQueryBuilder:
         - select(...).execute() (reads)   — paginated, fetches all rows
         - insert(...).execute() (writes)
         """
-        # ── Writes ────────────────────────────────────────────────────────────
+        
         if self._payload is not None:
             endpoint = f"{self._url}/rest/v1/{self._table}"
             r = self._http.post(
@@ -59,7 +59,6 @@ class _SupabaseQueryBuilder:
             r.raise_for_status()
             return _SupabaseRESTResponse(r.json())
  
-        # ── Reads (paginated) ─────────────────────────────────────────────────
         if self._select is None:
             raise ValueError("select(...) must be called before execute()")
  
