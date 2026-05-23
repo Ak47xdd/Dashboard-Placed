@@ -9,7 +9,6 @@ class _SupabaseRESTResponse:
     def __init__(self, data: Any):
         self.data = data
  
- 
 class _SupabaseQueryBuilder:
     def __init__(
         self,
