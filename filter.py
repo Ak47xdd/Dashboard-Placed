@@ -9,7 +9,6 @@ from college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_C
 _COLLEGE_LOWER_MAP = {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.items()}
 _DEPT_LOWER_MAP    = {k.lower(): v for k, v in DEPARTMENT_VARIANT_CANONICAL_MAP.items()}
  
- 
 def _normalize_college_name(series):
     """Normalize college_name using the module-level canonical map."""
     if series is None:
