@@ -23,7 +23,6 @@ def _normalize_college_name(series):
             s.loc[mask] = canonical
     return s
  
- 
 def filter_data(df, view: str = "classification"):
     init_session_state()
  
