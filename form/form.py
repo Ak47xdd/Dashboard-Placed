@@ -5,6 +5,9 @@ import pandas as pd
 import requests
 from marking import generate_classifications
 from datetime import datetime, timezone
+import os
+from dotenv import load_dotenv  
+load_dotenv()
 
 app = FastAPI(
     title="Profiling Form API",
@@ -33,9 +36,8 @@ app.add_middleware(
 
 MAIN_TABLE_NAME = "STUDENT_DATA"
 CLASS_TABLE_NAME = "CLASSIFICATION"
-SUPABASE_URL = "https://bzvztzxrrziqrfokcyuf.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6dnp0enhycnppcXJmb2tjeXVmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Nzk5MzMyNCwiZXhwIjoyMDkzNTY5MzI0fQ.HAUOI6sm4EOLKcKPScbkeA7fkt6Vtx0Iq2hdzRiXfaY"
-
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 def sync_STUDENT_csv_to_supabase():
     df = pd.read_csv('./data/STUDENTS - Sheet1.csv')
