@@ -343,4 +343,3 @@ def submit_profile(form_data: dict):
     
 if __name__ == "__main__":
     uvicorn.run("form:app", host="0.0.0.0", port=8001, reload=True)
-
