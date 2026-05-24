@@ -33,7 +33,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 MAIN_TABLE_NAME = "STUDENT_DATA"
 CLASS_TABLE_NAME = "CLASSIFICATION"
 SUPABASE_URL = os.getenv("SUPABASE_URL")
