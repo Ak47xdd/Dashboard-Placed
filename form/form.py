@@ -121,7 +121,6 @@ def submit_profile(form_data: dict):
     data = {
         'student_id': new_student_id,
         'created_at': created_at,
-
         'student_name': form_data.get('section0', {}).get('student_name', ''),
         'mobile_number': form_data.get('section0', {}).get('mobile_number', ''),
         'email_id': form_data.get('section0', {}).get('email_id', ''),
