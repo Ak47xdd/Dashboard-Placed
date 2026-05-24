@@ -71,8 +71,7 @@ def calculate_scores(row):
         'week_hr_weight': f'{week_hr_weight:.2f}',
         'final_score': f'{final_score:.2f}'
     })
-
-    
+ 
 def generate_classifications():
     raw_data = pd.read_csv('data/STUDENTS - Sheet1.csv')
     classified_df = raw_data.apply(calculate_scores, axis=1)
