@@ -80,4 +80,3 @@ def generate_classifications():
 
 if __name__ == "__main__":
     generate_classifications()
-
