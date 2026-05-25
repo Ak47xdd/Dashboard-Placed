@@ -26,7 +26,6 @@ def load_styles():
         f'<script>var REFRESH_SECONDS = {REFRESH_SECONDS};</script>',
         unsafe_allow_html=True
     )
-    
 
     script_file_path = os.path.join(FRONTEND_DIR, "script.js")
     try:
