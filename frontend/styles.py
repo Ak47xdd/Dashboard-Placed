@@ -62,4 +62,3 @@ def auto_refresh():
     except FileNotFoundError:
         pass
 
-
