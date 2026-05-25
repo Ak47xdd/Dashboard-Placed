@@ -33,7 +33,6 @@ def convert_png_to_base64(input_path: str, output_path: str) -> None:
     print(f"Output saved to: '{output_path}'")
     print(f"Base64 string length: {len(base64_data)} characters")
 
-
 def main():
     """Main function to run the conversion."""
     # Get the directory of this script
