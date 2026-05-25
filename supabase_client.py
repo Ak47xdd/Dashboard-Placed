@@ -140,4 +140,3 @@ def get_supabase() -> Any:
  
     return _SupabaseRESTClient(SUPABASE_URL, SUPABASE_KEY)
 
-
