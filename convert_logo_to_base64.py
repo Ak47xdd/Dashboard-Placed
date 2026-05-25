@@ -10,7 +10,6 @@ to Resources/Placed_base64.txt.
 import base64
 import os
 
-
 def convert_png_to_base64(input_path: str, output_path: str) -> None:
     """
     Convert a PNG image to base64 encoded text file.
