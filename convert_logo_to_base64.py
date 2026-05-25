@@ -45,6 +45,5 @@ def main():
     # Run the conversion
     convert_png_to_base64(input_path, output_path)
 
-
 if __name__ == '__main__':
     main()
