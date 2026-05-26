@@ -1,3 +1,7 @@
+"""
+This module defines all constants used across the application, including configuration settings,
+"""
+
 # All application constants should be defined here
 
 REFRESH_SECONDS = 30
