@@ -1,3 +1,9 @@
+"""
+Main Streamlit app entry point. Responsible for loading styles, data, 
+and rendering the appropriate dashboard based on user selection.
+"""
+
+
 import streamlit as st
 from datetime import datetime
 from frontend.bg import set_bg_image
