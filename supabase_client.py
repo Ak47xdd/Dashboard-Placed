@@ -1,3 +1,15 @@
+"""
+Client for interacting with Supabase REST API. 
+Provides a minimal interface for querying and inserting data without relying on the external `supabase` Python library, 
+ensuring compatibility with Python 3.14. Credentials are loaded from environment variables, 
+with optional support for `.env` files via `python-dotenv`.
+
+Please update the .env file with necessary credentials :
+    SUPABASE_URL=your_supabase_url
+    SUPABASE_KEY=your_supabase_key
+"""
+
+
 from __future__ import annotations
  
 from functools import lru_cache
