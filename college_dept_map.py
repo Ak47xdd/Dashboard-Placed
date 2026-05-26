@@ -1,3 +1,8 @@
+"""
+This module defines mappings for college and department name variants to their canonical forms.
+"""
+
+
 # Unified canonical mapping used by filters + charts
 # wrong/spelling-variant(lowercase) -> canonical college name(Display name)
 COLLEGE_VARIANT_CANONICAL_MAP = {
