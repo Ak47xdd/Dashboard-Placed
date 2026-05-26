@@ -1,3 +1,9 @@
+"""
+Filter Student Evaluation Dashboard data by college, department, year, and other criteria. 
+Also normalizes college/department names for consistent filtering and charting.
+"""
+
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
