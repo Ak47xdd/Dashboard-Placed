@@ -1,3 +1,10 @@
+"""
+Filters for Response Dashboard :
+This module implements the filtering logic for the Response Dashboard, 
+allowing users to filter student data by college, department, year, and other criteria. 
+It also handles normalization of college and department names to ensure consistent filtering and accurate charting.
+"""
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
