@@ -1,4 +1,5 @@
-"""Maps instructional-fit questionnaire values to numeric profile scale.
+"""
+Maps instructional-fit questionnaire values to numeric profile scale.
 
 Scale:
 1 = High
