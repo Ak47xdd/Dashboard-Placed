@@ -1,3 +1,9 @@
+"""
+Database query functions for fetching and inserting data from/to Supabase. 
+These functions are cached for faster computations.
+"""
+
+
 from __future__ import annotations
 from typing import Any
 import pandas as pd
