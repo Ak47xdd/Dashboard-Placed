@@ -1,3 +1,10 @@
+"""
+Python script to wake up the Streamlit app by simulating a user click on the "Yes, get this app back up" button if it 
+appears.
+
+Currently NOT used!
+"""
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
