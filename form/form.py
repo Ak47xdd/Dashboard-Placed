@@ -1,3 +1,8 @@
+"""
+Form submission API for the Profiling Form.
+"""
+
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
