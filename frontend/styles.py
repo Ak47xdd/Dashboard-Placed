@@ -1,3 +1,11 @@
+"""
+Styling utilities for the Streamlit app. 
+This module is responsible for loading external CSS, HTML templates, 
+and JavaScript files to enhance the appearance and functionality of the dashboard. 
+It also defines functions for setting page configuration and implementing auto-refresh with a countdown timer.
+"""
+
+
 import streamlit as st
 import os
 from constants import REFRESH_SECONDS
