@@ -1,3 +1,8 @@
+"""
+Streamlit app background image and styling utilities. 
+This module handles setting the background image for the dashboard.
+"""
+
 import streamlit as st
 import os
 
