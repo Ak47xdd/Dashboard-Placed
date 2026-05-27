@@ -1,3 +1,7 @@
+"""
+Data loading and processing utilities for the Student Evaluation Dashboard.
+"""
+
 import pandas as pd
 import os
 from datetime import datetime, timezone
