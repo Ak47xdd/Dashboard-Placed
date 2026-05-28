@@ -63,3 +63,4 @@ websockets==16.0
 wheel==0.47.0
 selenium
 webdriver-manager
+pytest==9.0.3
