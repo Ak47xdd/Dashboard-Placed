@@ -2,7 +2,6 @@
 Marking script to calculate final scores for each student based on their responses to the questionnaire.
 """
 
-
 import pandas as pd
 
 # Answer key from Resources/answers.txt
