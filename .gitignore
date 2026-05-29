@@ -217,3 +217,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Backup files
+CLASSIFICATION.csv
+STUDENT_DATA.csv
