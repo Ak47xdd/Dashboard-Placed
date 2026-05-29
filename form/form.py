@@ -81,14 +81,6 @@ def submit_profile(form_data: dict):
         return JSONResponse(status_code=500, content=class_result)
  
     return JSONResponse(status_code=200, content=class_result or {"message": "SUCCESS"})
-
-@app.get("/form/backup"):
-def backup_data():
-    """
-    Utility endpoint to backup all data from Supabase tables. Not exposed publicly.
-    """
-    # Implement backup logic here, e.g., fetch all rows from both tables and return as JSON or CSV.
-    return JSONResponse(status_code=200, content={"message": "Backup functionality not implemented yet."})
  
 if __name__ == "__main__":
     uvicorn.run("form:app", host="0.0.0.0", port=8001, reload=True)
