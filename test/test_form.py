@@ -1,3 +1,7 @@
+"""
+Test for cron endpoint.
+"""
+
 import requests
 
 API = 'https://dashboard-app-zggs.onrender.com'
