@@ -5,7 +5,6 @@ and JavaScript files to enhance the appearance and functionality of the dashboar
 It also defines functions for setting page configuration and implementing auto-refresh with a countdown timer.
 """
 
-
 import streamlit as st
 import os
 from constants import REFRESH_SECONDS
