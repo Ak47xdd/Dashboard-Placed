@@ -59,7 +59,6 @@ def add_student_entry(**kwargs):
     inserted_id = append_student_entry(data_dict)
     return inserted_id if inserted_id is not None else student_id
 
-
 def process_data(df):
     numeric_cols = ['quant_score', 'logic_score', 'verbal_score', 'final_score', 'student_id']
     for col in numeric_cols:
