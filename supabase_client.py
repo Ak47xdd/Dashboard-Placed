@@ -9,7 +9,6 @@ Please update the .env file with necessary credentials :
     SUPABASE_KEY=your_supabase_key
 """
 
-
 from __future__ import annotations
  
 from functools import lru_cache
