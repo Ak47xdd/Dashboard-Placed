@@ -2,7 +2,8 @@
 Python script to wake up the Streamlit app by simulating a user click on the "Yes, get this app back up" button if it 
 appears.
 
-Currently NOT used!
+Used at github.com/placed-dashboard/dashboard-app/main/.github/workflows/wake.yml to keep the app responsive for users with
+github actions cron jobs. Also includes a test to verify the cron endpoint is working as expected.
 """
 
 from selenium import webdriver
@@ -13,7 +14,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import TimeoutException
-import os
 
 # Streamlit app URL from environment variable (or default)
 STREAMLIT_URL = "https://students-dashboard-placed.streamlit.app/"
