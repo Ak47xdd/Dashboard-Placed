@@ -2,7 +2,6 @@
 Schema module responsible for transforming raw form data into the structured format
 """
  
- 
 from datetime import datetime, timezone
 import os
 import requests
