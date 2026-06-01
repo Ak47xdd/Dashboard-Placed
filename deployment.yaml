@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: fastapi-container
+          image: akshaybabu1945/my-fastapi-app:latest
+          ports:
+            - containerPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: profiler-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: profiler
+  template:
+    metadata:
+      labels:
+        app: profiler
+    spec:
+      containers:
+        - name: frontend-container
+          image: akshaybabu1945/frontend-profiler:latest
+          ports:
+            - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashboard-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashboard
+  template:
+    metadata:
+      labels:
+        app: dashboard
+    spec:
+      containers:
+        - name: dashboard-container
+          image: akshaybabu1945/dashboard-app:latest
+          ports:
+            - containerPort: 5500
+          envFrom:
+            - secretRef:
+                name: dashboard-env
