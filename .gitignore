@@ -157,6 +157,7 @@ ENV/
 env.bak/
 venv.bak/
 service_key.json
+k8s-secret.yaml
 
 # Spyder project settings
 .spyderproject
