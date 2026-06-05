@@ -35,14 +35,11 @@ def convert_png_to_base64(input_path: str, output_path: str) -> None:
 
 def main():
     """Main function to run the conversion."""
-    # Get the directory of this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     
-    # Define input and output paths
     input_path = os.path.join(script_dir, 'Resources', 'LOGO.png')
     output_path = os.path.join(script_dir, 'Resources', 'Placed_base64.txt')
     
-    # Run the conversion
     convert_png_to_base64(input_path, output_path)
 
 if __name__ == '__main__':
