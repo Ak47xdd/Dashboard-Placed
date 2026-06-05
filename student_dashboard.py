@@ -30,10 +30,10 @@ DF_COLS_TO_DROP = [
     "commit_Q3",
 ]
  
-# Consistent chart height used across every figure so rows align
+# Chart height
 CHART_H = 400
  
-# Build lowercase lookup maps once at module load — not inside every call
+# Build lowercase lookup maps (refer college_dept_map.py for the canonical maps and their maintenance)
 _COLLEGE_LOWER_MAP = {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.items()}
 _DEPT_LOWER_MAP    = {k.lower(): v for k, v in DEPARTMENT_VARIANT_CANONICAL_MAP.items()}
  
@@ -408,8 +408,7 @@ def render_student_tab(df: pd.DataFrame) -> None:
  
     df = filtered_df
 
-    # Map instruct_Q2 / instruct_Q3 numeric codes (1..4) to labels.
-    # Dashboard expects High/Medium/Low/None for display/heatmaps.
+    # Map instruct_Q2 / instruct_Q3 numeric codes (1..4) to labels to HIGH/MEDIUM/LOW.
     try:
         from questionnaire_instruct_map import normalize_instruct_value
 
