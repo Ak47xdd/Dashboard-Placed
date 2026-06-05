@@ -34,14 +34,12 @@ def main():
 
         wait = WebDriverWait(driver, 15)
         try:
-            # Look for the wake-up button
             button = wait.until(
                 EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Yes, get this app back up')]"))
             )
             print("Wake-up button found. Clicking...")
             button.click()
 
-            # After clicking, check if it disappears
             try:
                 wait.until(EC.invisibility_of_element_located((By.XPATH, "//button[contains(text(),'Yes, get this app back up')]")))
                 print("Button clicked and disappeared ✅ (app should be waking up)")
@@ -50,7 +48,6 @@ def main():
                 exit(1)
 
         except TimeoutException:
-            # No button at all → app is assumed to be awake
             print("No wake-up button found. Assuming app is already awake ✅")
 
     except Exception as e:
