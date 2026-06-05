@@ -99,7 +99,6 @@ class _SupabaseQueryBuilder:
             page = r.json()
             all_rows.extend(page)
  
-            # Supabase returns fewer rows than page_size on the last page
             if len(page) < page_size:
                 break
  
@@ -129,14 +128,13 @@ class _SupabaseTable(_SupabaseQueryBuilder):
 def get_supabase() -> Any:
     """Return a minimal Supabase REST client.
  
-    Avoids the external `supabase` Python library so the app works on Python 3.14.
     Credentials are loaded from environment variables.
     Supports optional `.env` loading via `python-dotenv` (if installed).
     """
     import os
  
     try:
-        from dotenv import load_dotenv  # type: ignore
+        from dotenv import load_dotenv  
         load_dotenv()
     except Exception:
         pass
