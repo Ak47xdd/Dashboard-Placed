@@ -10,13 +10,19 @@ It provides interactive visualizations, KPI cards, searchable tables, and period
 ![Streamlit Version](https://img.shields.io/badge/Streamlit-1.57.0+-06B3C9?style=flat&logo=streamlit)
 ![Python Version](https://img.shields.io/badge/Python-3.8+-3776AB?style=flat&logo=python)
 
+![Dashboard](./Resources/Dashboard.png)
+![Dashboard](./Resources/Dashboard2.png)
+
 ---
 
 ## Features
 
-- **Two Data Views**
+- **Two Data Views** (Click "<<" or ">>" button on top left to access)
   - Response Dashboard
   - Student Evaluation Dashboard
+
+![Drawer](./Resources/Drawer.png)
+
 - **Interactive Filters (Student Evaluation view)**
   - Filter by **College**, **Department**, and **Year**
   - Support for **custom filter text** (exact/custom matching)
