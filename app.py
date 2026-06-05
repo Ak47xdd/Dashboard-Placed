@@ -11,7 +11,7 @@ from frontend.styles import load_styles, set_page_config, auto_refresh
 from filter import filter_data
 from constants import REFRESH_SECONDS
  
-# Load all styles FIRST - this ensures they persist on refresh/rerun
+# Load all styles FIRST
 load_styles()
 set_bg_image()
 set_page_config()
@@ -19,7 +19,6 @@ set_page_config()
 col_refresh = st.columns([6, 1])
 with col_refresh[1]:
     if st.button("🔄 Refresh"):
-        # Bust both the @st.cache_data caches AND the processed df in session state
         st.cache_data.clear()
         for _key in ["df_raw", "df_classification"]:
             st.session_state.pop(_key, None)
@@ -38,9 +37,6 @@ data_view = st.sidebar.radio(
  
 view = "raw" if data_view.startswith("Student") else "classification"
  
-# Cache the loaded + processed df in session state so it isn't re-computed on
-# every widget interaction — only re-fetched when the cache is explicitly cleared
-# (manual refresh button or auto_refresh firing).
 cache_key = f"df_{view}"
 if cache_key not in st.session_state:
     df = load_data(view=view)
