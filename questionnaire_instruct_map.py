@@ -37,12 +37,6 @@ def normalize_instruct_value(x):
     if s == "":
         return None
 
-    # If already numeric, map questionnaire scale (3=Low, 2=Medium, 1=High, 4=None)
-    # to the output profile scale (1 High, 2 Medium, 3 Low, 4 None).
-    # In the dataset, instruct_Q* are stored as the questionnaire numeric options.
-    # So: 1->1, 2->2, 3->3, 4->4 is identity, BUT here UI expects
-    # the labels (High/Medium/Low/None) not the raw option number.
-    # normalize_instruct_value therefore intentionally keeps the same mapping.
     if s in {"1", "2", "3", "4"}:
         return int(s)
 
