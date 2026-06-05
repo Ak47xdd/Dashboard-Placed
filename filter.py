@@ -12,7 +12,7 @@ from constants import REFRESH_SECONDS
 from datetime import datetime
 from college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_CANONICAL_MAP
  
-# Build lowercase lookup maps once at module load — not inside every function call
+# Build lowercase lookup maps (refer college_dept_map.py for the canonical maps and their maintenance)
 _COLLEGE_LOWER_MAP = {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.items()}
 _DEPT_LOWER_MAP    = {k.lower(): v for k, v in DEPARTMENT_VARIANT_CANONICAL_MAP.items()}
  
@@ -33,7 +33,6 @@ def _normalize_college_name(series):
 def filter_data(df, view: str = "classification"):
     init_session_state()
  
-    # RAW STUDENT VIEW: render the questionnaire dashboard only.
     if view == "raw":
         from student_dashboard import render_student_tab
         render_student_tab(df)
@@ -41,9 +40,6 @@ def filter_data(df, view: str = "classification"):
  
     filtered_df = df.copy()
  
-    # Normalize known spelling variants so filters/charts treat them as the same category.
-    # Note: df coming from db_queries already has normalization applied at fetch time.
-    # This pass handles any residual variants that survive the fetch-time normalization.
     if 'college_name' in filtered_df.columns:
         filtered_df['college_name'] = (
             filtered_df['college_name'].fillna('').astype(str).str.strip()
@@ -202,8 +198,7 @@ def filter_data(df, view: str = "classification"):
     st.session_state.custom_year = custom_year
  
     # ============ KPIs, Charts, Table ============
-    # Score/KPI charts depend on classification score columns (quant_score, final_score, year).
-    # The live dashboard datasource is SUPA_RAW_DB (STUDENT_DATA) which contains profile preference columns.
+
     score_columns_present = any(c in filtered_df.columns for c in ["final_score", "quant_score", "logic_score", "verbal_score"])
  
     if score_columns_present and "final_score" in filtered_df.columns:
