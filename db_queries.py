@@ -17,6 +17,7 @@ def _normalize(df: pd.DataFrame) -> pd.DataFrame:
     Called once at fetch time so the result is cached with the data — never runs
     again until the cache expires.
     """
+    
     from college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_CANONICAL_MAP
  
     out = df.copy()
@@ -42,11 +43,15 @@ def _normalize(df: pd.DataFrame) -> pd.DataFrame:
  
 @st.cache_data(ttl=30)
 def fetch_classification_df() -> pd.DataFrame:
-    """Fetch rows from Supabase classification table into a DataFrame."""
+    """
+    Fetch rows from Supabase classification table into a DataFrame.
+    """
+    
     supa = get_supabase()
     res = supa.table(SUPA_DB).select("*").execute()
     rows: list[dict[str, Any]] = getattr(res, "data", None) or []
     df = pd.DataFrame(rows)
+    
     return _normalize(df)
  
  
@@ -56,15 +61,20 @@ def fetch_student_raw_df() -> pd.DataFrame:
     Fetch rows from Supabase raw STUDENT_DATA table into a DataFrame.
     Normalization is applied here so it only runs once per cache cycle.
     """
+    
     supa = get_supabase()
     res = supa.table(SUPA_RAW_DB).select("*").execute()
     rows: list[dict[str, Any]] = getattr(res, "data", None) or []
     df = pd.DataFrame(rows)
+    
     return _normalize(df)
  
  
 def append_student_entry(data_dict: dict[str, Any]) -> int | None:
-    """Insert a row into Supabase classification table."""
+    """
+    Insert a row into Supabase classification table.
+    """
+    
     supa = get_supabase()
  
     payload = dict(data_dict)
