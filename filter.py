@@ -17,7 +17,10 @@ _COLLEGE_LOWER_MAP = {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.ite
 _DEPT_LOWER_MAP    = {k.lower(): v for k, v in DEPARTMENT_VARIANT_CANONICAL_MAP.items()}
  
 def _normalize_college_name(series):
-    """Normalize college_name using the module-level canonical map."""
+    """
+    Normalize college_name using the module-level canonical map.
+    """
+    
     if series is None:
         return series
     s = series.fillna("").astype(str).str.strip()
@@ -31,6 +34,7 @@ def _normalize_college_name(series):
     return s
  
 def filter_data(df, view: str = "classification"):
+    
     init_session_state()
  
     if view == "raw":
@@ -356,7 +360,10 @@ def filter_data(df, view: str = "classification"):
  
  
 def init_session_state():
-    """Initialize session state for categorical filters only."""
+    """
+    Initialize session state for categorical filters only.
+    """
+    
     defaults = {
         'selected_colleges': [],
         'custom_college': '',
