@@ -26,11 +26,13 @@ INSTRUCT_Q3_MAP = {
 }
 
 def normalize_instruct_value(x):
-    """Normalize a single raw value to the 1..4 scale.
+    """
+    Normalize a single raw value to the 1..4 scale.
 
     Accepts already-numeric strings ("1".."4") as well as the option labels.
     Returns None if value is missing/unrecognized.
     """
+    
     if x is None:
         return None
     s = str(x).strip()
