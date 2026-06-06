@@ -9,9 +9,9 @@ import plotly.express as px
 import plotly.graph_objects as go
  
 from college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_CANONICAL_MAP
- 
+
 # =============== Constants ===============
- 
+
 ZERO_VARIANCE_COLS = [
     "learn_Q3",
     "learn_Q4",
