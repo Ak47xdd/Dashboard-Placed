@@ -7,8 +7,8 @@ This module defines all constants used across the application, including configu
 REFRESH_SECONDS = 30
 
 # Toggle data source:
-# - USE_CSV = True  => read from local CSV files
-# - USE_CSV = False => read from Supabase
+# - USE_CSV = True  => read from local CSV files (TEST, STATIC DATA)
+# - USE_CSV = False => read from Supabase (LIVE DATABASE)
 USE_CSV = False
 
 MAIN_CSV = "STUDENTS - Sheet1"
