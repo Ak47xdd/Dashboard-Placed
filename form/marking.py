@@ -17,7 +17,6 @@ def normalize_answer(raw):
         return 0
 
 def calculate_scores(row):
-    # Validate aptitude answers
     quant_correct = 0
     for i in range(1, 6):
         key = quant_answers[i-1]
