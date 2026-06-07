@@ -21,6 +21,7 @@ def submit_classification_data(classification_payload: dict):
     """
     Insert the calculated classification data into Supabase.
     """
+    
     headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
@@ -32,7 +33,6 @@ def submit_classification_data(classification_payload: dict):
     inserted = student_data.student_res_json if student_data.student_res_json is not None else (student_data.student_res.text or [])
 
     inserted = student_data.student_res.json() if student_data.student_res.text else []
-    # Supabase returns inserted rows when Prefer: return=representation is set.
     inserted_row = None
     if isinstance(inserted, list) and inserted:
         inserted_row = inserted[0]
@@ -113,7 +113,6 @@ def submit_classification_data(classification_payload: dict):
                 latest_class_res.raise_for_status()
                 latest_class = latest_class_res.json()
         except Exception as e:
-            # Fallback: no order clause
             print("[submit-profile] read-back class ordered failed:", str(e))
             try:
                 latest_class_url = (
