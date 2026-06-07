@@ -62,6 +62,7 @@ def cron_job():
     Cron task — triggered every 10 minutes by cron-job.org to prevent
     the Render free-tier instance from spinning down.
     """
+    
     return {"status": "ok", "message": "Cron job complete, next one in 10 minutes"}
  
  
@@ -71,9 +72,9 @@ def submit_profile(form_data: dict):
     Insert the submitted questionnaire into Supabase, then insert
     the calculated classification row.
     """
+    
     student_result = student_data.submit_student_data(form_data)
  
-    # If student insert failed, surface the error immediately.
     if isinstance(student_result, dict) and student_result.get("student_id") is None:
         return JSONResponse(status_code=500, content=student_result)
  
