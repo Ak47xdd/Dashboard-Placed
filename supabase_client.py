@@ -1,7 +1,7 @@
 """
 Client for interacting with Supabase REST API. 
 Provides a minimal interface for querying and inserting data without relying on the external `supabase` Python library, 
-ensuring compatibility with Python 3.14. Credentials are loaded from environment variables, 
+ensuring compatibility with other libraries. Credentials are loaded from environment variables, 
 with optional support for `.env` files via `python-dotenv`.
 
 Please update the .env file with necessary credentials :
@@ -46,7 +46,8 @@ class _SupabaseQueryBuilder:
         return self
  
     def execute(self) -> _SupabaseRESTResponse:
-        """Execute the prepared query.
+        """
+        Execute the prepared query.
  
         Supported operations (the only ones used in this repo):
         - select(...).execute() (reads)   — paginated, fetches all rows
@@ -106,7 +107,8 @@ class _SupabaseQueryBuilder:
  
         return _SupabaseRESTResponse(all_rows)
  
-    def __call__(self) -> _SupabaseRESTResponse:  # pragma: no cover
+    def __call__(self) -> _SupabaseRESTResponse:  
+        
         return self.execute()
  
  
@@ -117,6 +119,7 @@ class _SupabaseRESTClient:
         self._http = requests.Session()
  
     def table(self, table: str) -> "_SupabaseTable":
+        
         return _SupabaseTable(table, self._http, self._url, self._api_key)
  
  
@@ -126,11 +129,13 @@ class _SupabaseTable(_SupabaseQueryBuilder):
  
 @lru_cache(maxsize=1)
 def get_supabase() -> Any:
-    """Return a minimal Supabase REST client.
+    """
+    Return a minimal Supabase REST client.
  
     Credentials are loaded from environment variables.
     Supports optional `.env` loading via `python-dotenv` (if installed).
     """
+    
     import os
  
     try:
