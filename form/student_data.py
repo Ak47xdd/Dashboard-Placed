@@ -13,12 +13,14 @@ CLASS_TABLE_NAME = "CLASSIFICATION"
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
  
-# Module-level globals so classification.py can read the inserted row
 student_res = None
 student_res_json = None
  
 def submit_student_data(form_data: dict):
-    """Insert the submitted questionnaire directly into Supabase."""
+    """
+    Insert the submitted questionnaire directly into Supabase.
+    """
+    
     global student_res, student_res_json
  
     data = schema.schema(form_data)
