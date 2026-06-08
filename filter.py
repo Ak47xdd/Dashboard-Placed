@@ -1,6 +1,6 @@
 """
-Filters for Response Dashboard :
-This module implements the filtering logic for the Response Dashboard, 
+Filters for Response Dashboard/Student Evaluation Dashboard.:
+This module implements the filtering logic for the Dashboard, 
 allowing users to filter student data by college, department, year, and other criteria. 
 It also handles normalization of college and department names to ensure consistent filtering and accurate charting.
 """
@@ -10,6 +10,7 @@ import pandas as pd
 import plotly.express as px
 from constants import REFRESH_SECONDS
 from datetime import datetime
+from student_dashboard import render_student_tab
 from college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_CANONICAL_MAP
  
 # Build lowercase lookup maps (refer college_dept_map.py for the canonical maps and their maintenance)
@@ -38,7 +39,6 @@ def filter_data(df, view: str = "classification"):
     init_session_state()
  
     if view == "raw":
-        from student_dashboard import render_student_tab
         render_student_tab(df)
         return
  
@@ -142,7 +142,6 @@ def filter_data(df, view: str = "classification"):
                 placeholder="e.g., '1', '4'"
             )
  
-    # Apply categorical filters (case-insensitive partial match)
     all_colleges = selected_colleges.copy()
     if custom_college.strip():
         all_colleges.append(custom_college.strip())
