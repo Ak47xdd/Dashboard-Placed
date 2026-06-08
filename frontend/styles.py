@@ -12,7 +12,10 @@ from constants import REFRESH_SECONDS
 FRONTEND_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def load_styles():
-    """Load all external styles, templates, and scripts - call this on every rerun"""
+    """
+    Load all external styles, templates, and scripts - call this on every rerun
+    """
+    
     css_file_path = os.path.join(FRONTEND_DIR, "styles.css")
     try:
         with open(css_file_path, "r") as f:
