@@ -7,10 +7,13 @@ import streamlit as st
 import os
 
 def set_bg_image():
-    """Set background image with enhanced overlay for better readability"""
-    frontend_dir = os.path.dirname(os.path.abspath(__file__))
+    """
+    Set background image with enhanced overlay for better readability
+    """
     
-    css_file_path = os.path.join(frontend_dir, "bg.css")
+    FORNTEND_DIR = os.path.dirname(os.path.abspath(__file__))
+    
+    css_file_path = os.path.join(FORNTEND_DIR, "bg.css")
     try:
         with open(css_file_path, "r") as f:
             css_content = f.read()
@@ -32,5 +35,4 @@ def set_bg_image():
         )
         
     except FileNotFoundError:
-        # No background image - fallback CSS in bg.css handles this
         pass
