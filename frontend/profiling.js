@@ -1,9 +1,9 @@
-// Profiling Form - Fixed submission & progress bar (v2 - 422 debug)
+// Profiling Form - Fixed submission & progress bar
 // Backend: https://dashboard-app-zggs.onrender.com/form/submit-profile
-// Total questions: 50 exact
+// Total questions: 49 exact
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ Profiling JS v2 loaded');
+    console.log('Profiling JS loaded');
     
     const form = document.getElementById('profiling-form');
     const progressFill = document.getElementById('progress-fill');
@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const TOTAL_QUESTIONS = 49;
 
-    // Option cards
     document.querySelectorAll('.option-card').forEach(card => {
         card.style.cursor = 'pointer';
         card.addEventListener('click', function() {
@@ -72,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function buildPayload() {
-        validateForm(); // Log only
+        validateForm(); 
         
         const data = {
             section0: {
@@ -123,21 +122,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
 
-        console.log('📤 Payload size:', JSON.stringify(data).length);
+        console.log('Payload size:', JSON.stringify(data).length);
         console.log('Payload:', data);
         return data;
     }
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        console.log('🚀 Submit clicked');
+        console.log('Submit clicked');
         
         submitBtn.disabled = true;
         submitBtn.textContent = 'Sending...';
         
         try {
             const payload = buildPayload();
-            console.log('🌐 Fetching');
+            console.log('Fetching');
             
             const response = await fetch('https://dashboard-app-zggs.onrender.com/form/submit-profile', {
 
@@ -146,10 +145,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(payload)
             });
             
-            console.log('📡 Response status:', response.status, response.statusText);
+            console.log('Response status:', response.status, response.statusText);
             
             const text = await response.text();
-            console.log('📄 Raw response text:', text);
+            console.log('Raw response text:', text);
             
             let result;
             try {
@@ -159,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (response.ok) {
-                alert(`✅ SUCCESS! ID: ${result.student_id}\nData Added`);
+                alert(`SUCCESS! ID: ${result.student_id}\nData Added`);
                 form.reset();
             } else {
                 console.error('422 ERROR:', result);
@@ -167,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
         } catch (error) {
-            console.error('💥 Full error:', error);
+            console.error('Full error:', error);
             alert(`Error: ${error.message}`);
         } finally {
             submitBtn.disabled = false;
@@ -176,10 +175,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Events & init
     ['input', 'change'].forEach(ev => form.addEventListener(ev, updateProgress));
     
-    // Draft restore
     const draft = localStorage.getItem('profiling-draft');
     if (draft) {
         Object.entries(JSON.parse(draft)).forEach(([name, val]) => {
@@ -189,5 +186,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     updateProgress();
-    console.log('🎯 Ready - reload page to test');
+    console.log('Ready - reload page to test');
 });
