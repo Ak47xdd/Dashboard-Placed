@@ -7,7 +7,7 @@ import os
 from datetime import datetime, timezone
 
 from constants import USE_CSV
-from db_queries import fetch_classification_df
+from db_queries import fetch_classification_df, append_student_entry, fetch_student_raw_df
 
 def load_data(view: str = "classification"):
     """
@@ -30,8 +30,6 @@ def load_data(view: str = "classification"):
         return pd.DataFrame()
 
     if view == "raw":
-        from db_queries import fetch_student_raw_df
-
         return fetch_student_raw_df()
 
     return fetch_classification_df()
@@ -57,8 +55,6 @@ def add_student_entry(**kwargs):
 
         print(f"SAVED Student ID {student_id}")
         return student_id
-
-    from db_queries import append_student_entry
 
     inserted_id = append_student_entry(data_dict)
     return inserted_id if inserted_id is not None else student_id
