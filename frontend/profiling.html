@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLACED - CRP Diagnostic Profiling</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="dashboard.css">
-    <link rel="stylesheet" href="profiling.css">
+    <link rel="stylesheet" href="css/form.css">
+    <link rel="stylesheet" href="css/profiling.css">
 </head>
 <body class="dashboard-body">
     <div class="title-container">
@@ -21,7 +21,6 @@
     </div>
 
     <form id="profiling-form" class="form-container">
-        <!-- Section 0: Student Identification -->
         <div class="section">
             <h2>Student Identification</h2>
             <div class="question">
@@ -46,7 +45,6 @@
             </div>
         </div>
 
-        <!-- Section 1: Basic Information -->
         <div class="section">
             <h2>Basic Information</h2>
             <div class="question">
@@ -98,10 +96,8 @@
             </div>
         </div>
 
-        <!-- Section 2: Aptitude MCQs (0-3 indices) -->
         <div class="section">
             <h2>Aptitude Test</h2>
-            <!-- Quantitative -->
             <h3>Quantitative Aptitude</h3>
             <div class="question">
                 <label>Q1: If 12 men complete a work in 8 days, how many men for 6 days?</label>
@@ -149,7 +145,6 @@
                 </div>
             </div>
 
-            <!-- Logical Reasoning -->
             <h3>Logical Reasoning</h3>
             <div class="question">
                 <label>Q1: Odd one out: Apple, Mango, Banana, Carrot</label>
@@ -169,7 +164,6 @@
                     <label class="option-card"><input type="radio" name="logic2" value="4"> EPH</label>
                 </div>
             </div>
-            <!-- Continue for logic3-5, verbal1-5 with similar pattern (abbreviated for space, full in actual) -->
 <div class="question">
                 <label>Q3: All pens are books. Some books are tables. Conclusion?</label>
                 <div class="options-grid mcq-grid">
@@ -198,7 +192,6 @@
                 </div>
             </div>
 
-            <!-- Verbal Ability -->
             <h3>Verbal Ability</h3>
             <div class="question">
                 <label>Q1: Synonym of "ABUNDANT"</label>
@@ -247,7 +240,6 @@
             </div>
         </div>
 
-        <!-- Section 3: Behavioural (1-5 scale) -->
         <div class="section">
             <h2>Behavioural Index (1=Strongly Disagree, 5=Strongly Agree)</h2>
             <div class="question">
@@ -260,7 +252,6 @@
                     <label class="option-card"><input type="radio" name="section3.behave_Q1" value="5"> 5</label>
                 </div>
             </div>
-            <!-- Similar for behave_Q2-Q5 -->
             <div class="question">
                 <label>I practice consistently every day</label>
                 <div class="options-grid scale-grid">
@@ -303,7 +294,6 @@
             </div>
         </div>
 
-        <!-- Section 4: Learning Response -->
         <div class="section">
             <h2>Learning Response</h2>
             <div class="question">
@@ -343,7 +333,6 @@
             </div>
         </div>
 
-        <!-- Section 5: Instructional Fit -->
         <div class="section">
             <h2>Instructional Fit</h2>
             <div class="question">
@@ -402,7 +391,6 @@
             </div>
         </div>
 
-        <!-- Section 5A: Content Delivery Preference -->
         <div class="section">
             <h2>Content Delivery Preference (5A)</h2>
             <div class="question">
@@ -434,7 +422,6 @@
             </div>
         </div>
 
-        <!-- Section 5B: Engagement Type -->
         <div class="section">
             <h2>Engagement Type (5B)</h2>
             <div class="question">
@@ -475,7 +462,6 @@
             </div>
         </div>
 
-        <!-- Section 6: Commitment -->
         <div class="section">
             <h2>Commitment</h2>
             <div class="question">
@@ -505,12 +491,11 @@
             </div>
         </div>
 
-        <!-- Submit Button -->
         <div class="submit-section">
             <button type="submit" class="submit-btn">Submit Profile</button>
         </div>
     </form>
 
-    <script src="profiling.js"></script>
+    <script src="js/profiling.js"></script>
 </body>
 </html>
