@@ -3,7 +3,7 @@ name: Daily Python Script
 on:
   schedule:
     # This runs the script every day at midnight UTC
-    - cron: '0 0 * * *'
+    - cron: "0 */12 * * *"
   workflow_dispatch: # Allows you to run it manually from the Actions tab
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.14'
+          python-version: "3.14"
 
       - name: Install dependencies
         run: |
