@@ -13,7 +13,7 @@ def set_bg_image():
     
     FORNTEND_DIR = os.path.dirname(os.path.abspath(__file__))
     
-    css_file_path = os.path.join(FORNTEND_DIR, "bg.css")
+    css_file_path = os.path.join(FORNTEND_DIR, "css/bg.css")
     try:
         with open(css_file_path, "r") as f:
             css_content = f.read()
