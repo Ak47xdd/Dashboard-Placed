@@ -8,7 +8,7 @@ from datetime import datetime
 from frontend.bg import set_bg_image
 from data.data import load_data, process_data
 from frontend.styles import load_styles, set_page_config, auto_refresh
-from filter import filter_data
+from filters.filter import filter_data
 from constants import REFRESH_SECONDS
  
 load_styles()

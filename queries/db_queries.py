@@ -9,7 +9,7 @@ import pandas as pd
 import streamlit as st
  
 from constants import SUPA_DB, SUPA_RAW_DB
-from supabase_client import get_supabase
+from queries.supabase_client import get_supabase
  
 def _normalize(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -18,7 +18,7 @@ def _normalize(df: pd.DataFrame) -> pd.DataFrame:
     again until the cache expires.
     """
     
-    from college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_CANONICAL_MAP
+    from filters.college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_CANONICAL_MAP
  
     out = df.copy()
  

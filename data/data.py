@@ -7,7 +7,7 @@ import os
 from datetime import datetime, timezone
 
 from constants import USE_CSV
-from db_queries import fetch_classification_df, append_student_entry, fetch_student_raw_df
+from queries.db_queries import fetch_classification_df, append_student_entry, fetch_student_raw_df
 
 def load_data(view: str = "classification"):
     """

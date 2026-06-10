@@ -8,7 +8,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
  
-from college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_CANONICAL_MAP
+from filters.college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_CANONICAL_MAP
 
 # =============== Constants ===============
 
@@ -410,7 +410,7 @@ def render_student_tab(df: pd.DataFrame) -> None:
 
     # Map instruct_Q2 / instruct_Q3 numeric codes (1..4) to labels to HIGH/MEDIUM/LOW.
     try:
-        from questionnaire_instruct_map import normalize_instruct_value
+        from filters.questionnaire_instruct_map import normalize_instruct_value
 
         inv_map = {1: "High", 2: "Medium", 3: "Low", 4: "None"}
         for q in ["instruct_Q2", "instruct_Q3"]:
