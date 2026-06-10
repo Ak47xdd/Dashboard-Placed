@@ -16,7 +16,7 @@ def load_styles():
     Load all external styles, templates, and scripts - call this on every rerun
     """
     
-    css_file_path = os.path.join(FRONTEND_DIR, "styles.css")
+    css_file_path = os.path.join(FRONTEND_DIR, "css/styles.css")
     try:
         with open(css_file_path, "r") as f:
             css_content = f.read()
@@ -24,11 +24,11 @@ def load_styles():
     except FileNotFoundError:
         pass
     
-    template_file_path = os.path.join(FRONTEND_DIR, "template.html")
+    title_file_path = os.path.join(FRONTEND_DIR, "title.html")
     try:
-        with open(template_file_path, "r") as f:
-            template_content = f.read()
-        st.markdown(template_content, unsafe_allow_html=True)
+        with open(title_file_path, "r") as f:
+            title_content = f.read()
+        st.markdown(title_content, unsafe_allow_html=True)
     except FileNotFoundError:
         pass
     
@@ -45,7 +45,7 @@ def load_styles():
     except FileNotFoundError:
         pass
 
-    filter_css_path = os.path.join(FRONTEND_DIR, "filter_styles.css")
+    filter_css_path = os.path.join(FRONTEND_DIR, "css/filter_styles.css")
     try:
         with open(filter_css_path, "r") as f:
             filter_css = f.read()
