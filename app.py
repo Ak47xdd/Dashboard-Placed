@@ -17,7 +17,7 @@ set_page_config()
  
 col_refresh = st.columns([6, 1])
 with col_refresh[1]:
-    if st.button("🔄 Refresh"):
+    if st.button("Refresh"):
         st.cache_data.clear()
         for _key in ["df_raw", "df_classification"]:
             st.session_state.pop(_key, None)
@@ -28,7 +28,7 @@ auto_refresh()
 st.caption(f"Auto-refresh every {REFRESH_SECONDS} seconds | Last updated: {datetime.now().strftime('%H:%M:%S')}")
  
 data_view = st.sidebar.radio(
-    "📌 Data view",
+    "Data view",
     options=["Response Dashboard", "Student Evaluation Dashboard"],
     index=0,
     help="Choose 'Response Dashboard' to explore aggregated insights from student responses. Choose 'Student Evaluation Dashboard' to view detailed student-level data and filter by various criteria.",
