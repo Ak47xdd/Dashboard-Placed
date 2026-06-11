@@ -12,7 +12,7 @@ from constants import REFRESH_SECONDS
 from datetime import datetime
 from filters.student_dashboard import render_student_tab
 from filters.college_dept_map import COLLEGE_VARIANT_CANONICAL_MAP, DEPARTMENT_VARIANT_CANONICAL_MAP
- 
+
 # Build lowercase lookup maps (refer college_dept_map.py for the canonical maps and their maintenance)
 _COLLEGE_LOWER_MAP = {k.lower(): v for k, v in COLLEGE_VARIANT_CANONICAL_MAP.items()}
 _DEPT_LOWER_MAP    = {k.lower(): v for k, v in DEPARTMENT_VARIANT_CANONICAL_MAP.items()}
