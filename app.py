@@ -28,7 +28,7 @@ auto_refresh()
 st.caption(f"Auto-refresh every {REFRESH_SECONDS} seconds | Last updated: {datetime.now().strftime('%H:%M:%S')}")
  
 data_view = st.sidebar.radio(
-    "Data view",
+    "Data View",
     options=["Response Dashboard", "Student Evaluation Dashboard"],
     index=0,
     help="Choose 'Response Dashboard' to explore aggregated insights from student responses. Choose 'Student Evaluation Dashboard' to view detailed student-level data and filter by various criteria.",
