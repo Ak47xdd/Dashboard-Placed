@@ -129,7 +129,7 @@ Dashboard-Placed/
 │   ├── Placed_base64.txt
 │   └── LOGO.png
 │   └── Profiling questionnaire.docx
-└── README.md
+└── ...
 ```
 
 ## Containerization & Deployment (Docker + Kubernetes)
