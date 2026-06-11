@@ -37,7 +37,7 @@ def _normalize_college_name(series):
 def filter_data(df, view: str = "classification"):
     
     init_session_state()
- 
+
     if view == "raw":
         render_student_tab(df)
         return
