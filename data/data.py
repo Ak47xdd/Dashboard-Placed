@@ -38,7 +38,7 @@ def add_student_entry(**kwargs):
     """
     Insert into Supabase or append to local CSV depending on USE_CSV.
     """
-    
+  
     data_dict = kwargs.get('data_dict', {})
 
     student_id = data_dict.get('student_id')
