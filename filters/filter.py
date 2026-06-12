@@ -78,7 +78,7 @@ def filter_data(df, view: str = "classification"):
     filter_container = st.container()
     with filter_container:
         col1, col2, col3 = st.columns(3)
- 
+
         with col1:
             colleges = (
                 sorted(filtered_df['college_name'].dropna().unique().tolist())
