@@ -67,7 +67,7 @@ def filter_data(df, view: str = "classification"):
         filtered_df['department'] = filtered_df['department'].astype(str).str.strip()
 
     # ===== CATEGORICAL FILTERS ONLY (College, Department, Year) =====
- 
+
     st.markdown("""
     <div class="main-filter-section">
         <h2 class="main-filter-title">College & Program Filters</h2>
