@@ -65,7 +65,7 @@ def filter_data(df, view: str = "classification"):
             if mask.any():
                 filtered_df.loc[mask, 'department'] = canonical
         filtered_df['department'] = filtered_df['department'].astype(str).str.strip()
- 
+
     # ===== CATEGORICAL FILTERS ONLY (College, Department, Year) =====
  
     st.markdown("""
