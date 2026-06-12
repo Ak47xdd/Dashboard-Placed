@@ -43,7 +43,7 @@ def filter_data(df, view: str = "classification"):
         return
 
     filtered_df = df.copy()
- 
+
     if 'college_name' in filtered_df.columns:
         filtered_df['college_name'] = (
             filtered_df['college_name'].fillna('').astype(str).str.strip()
