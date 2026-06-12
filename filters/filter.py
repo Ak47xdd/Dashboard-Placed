@@ -41,7 +41,7 @@ def filter_data(df, view: str = "classification"):
     if view == "raw":
         render_student_tab(df)
         return
- 
+
     filtered_df = df.copy()
  
     if 'college_name' in filtered_df.columns:
