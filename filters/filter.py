@@ -54,7 +54,7 @@ def filter_data(df, view: str = "classification"):
             if mask.any():
                 filtered_df.loc[mask, 'college_name'] = canonical
         filtered_df['college_name'] = filtered_df['college_name'].astype(str).str.strip()
- 
+
     if 'department' in filtered_df.columns:
         filtered_df['department'] = (
             filtered_df['department'].fillna('').astype(str).str.strip()
