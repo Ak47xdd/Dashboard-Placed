@@ -87,7 +87,7 @@ def filter_data(df, view: str = "classification"):
             )
             # Re-normalize dropdown labels using module-level map (no dict rebuild)
             colleges = [_normalize_college_name(pd.Series([c])).iloc[0] for c in colleges]
- 
+
             selected_colleges = st.multiselect(
                 "College", colleges,
                 default=st.session_state.get('selected_colleges', []),
