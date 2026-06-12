@@ -74,7 +74,7 @@ def filter_data(df, view: str = "classification"):
         <p class="filter-subtitle">Select colleges, departments, years or type custom values. Leave empty to show all.</p>
     </div>
     """, unsafe_allow_html=True)
- 
+
     filter_container = st.container()
     with filter_container:
         col1, col2, col3 = st.columns(3)
