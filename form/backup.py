@@ -25,7 +25,6 @@ def backup_data():
 
     RAW_CSV_PATH = os.path.join(data_dir, "STUDENT_DATA.csv")
     CLASS_CSV_PATH = os.path.join(data_dir, "CLASSIFICATION.csv")
-
     
     STUDENTS_ENDPOINT = f"{SUPABASE_URL}/rest/v1/{MAIN_TABLE_NAME}"
     CLASSIFICATION_ENDPOINT = f"{SUPABASE_URL}/rest/v1/{CLASS_TABLE_NAME}"
