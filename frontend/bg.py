@@ -36,3 +36,4 @@ def set_bg_image():
         
     except FileNotFoundError:
         pass
+        
