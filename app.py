@@ -14,7 +14,7 @@ from constants import REFRESH_SECONDS
 load_styles()
 set_bg_image()
 set_page_config()
- 
+
 col_refresh = st.columns([6, 1])
 with col_refresh[1]:
     if st.button("Refresh"):
