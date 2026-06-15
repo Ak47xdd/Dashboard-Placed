@@ -30,7 +30,7 @@ def main():
     try:
         driver.get(STREAMLIT_URL)
         print(f"Opened {STREAMLIT_URL}")
-
+        
         wait = WebDriverWait(driver, 15)
         try:
             button = wait.until(
