@@ -22,7 +22,7 @@ def backup_data():
     
     curr = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(curr, "..", "data/backups"))
-
+    
     RAW_CSV_PATH = os.path.join(data_dir, "STUDENT_DATA.csv")
     CLASS_CSV_PATH = os.path.join(data_dir, "CLASSIFICATION.csv")
     
