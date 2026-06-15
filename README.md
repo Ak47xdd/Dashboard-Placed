@@ -1,11 +1,13 @@
 # Dashboard-Placed
 
-A Streamlit-based analytics dashboard for student placement and learning-questionnaire insights. The app supports two views:
+A Streamlit-based analytics dashboard for student placement and learning-questionnaire insights.
 
-- **Response Dashboard** (aggregated / classification-style insights)
-- **Student Evaluation Dashboard** (student-level questionnaire responses with rich charts + filtering)
+The app provides two dashboards:
 
-It provides interactive visualizations, KPI cards, searchable tables, and periodic auto-refresh.
+- **Response Dashboard**: aggregated/classification-style insights
+- **Student Evaluation Dashboard**: student-level questionnaire analytics with rich charts and filtering
+
+It includes KPI cards, searchable/exportable tables, normalization for consistent categories, and periodic auto-refresh.
 
 ![Streamlit Version](https://img.shields.io/badge/Streamlit-1.57.0+-06B3C9?style=flat&logo=streamlit)
 ![Python Version](https://img.shields.io/badge/Python-3.8+-3776AB?style=flat&logo=python)
@@ -17,164 +19,143 @@ It provides interactive visualizations, KPI cards, searchable tables, and period
 
 ## Features
 
-- **Two Data Views** (Click "<<" or ">>" button on top left to access)
-  - Response Dashboard
-  - Student Evaluation Dashboard
+### Two dashboard views
 
-![Drawer](./Resources/Drawer.png)
+- Use the UI toggle ("<<" / ">>") to switch between:
+  - **Response Dashboard**
+  - **Student Evaluation Dashboard**
 
-- **Interactive Filters (Student Evaluation view)**
-  - Filter by **College**, **Department**, and **Year**
-  - Support for **custom filter text** (exact/custom matching)
-  - **Clear All Filters** button
-- **Normalization for Consistent Categories**
-  - College/Department spelling variants are normalized using canonical maps.
-- **Rich Visualizations (Student Evaluation view)**
-  - Sunburst (College → Department → Year)
-  - Pie charts (e.g., medium, career goal)
-  - Grouped bar charts (career goals vs prep-test)
-  - Stacked bar (learning seek-answer profile)
-  - Bubble chart (teaching style fit)
-  - Donuts (content vs engagement)
-  - Score analytics charts (when score columns exist)
-- **KPIs (Student Evaluation view)**
-  - Total Students
-  - Colleges / Departments counts
-  - In-Campus Placement Seekers (% derived from `career_goal`)
-- **Student Table + Export**
-  - Student responses table with column cleanup
-  - Student ID selection filter
-  - **Export CSV** (filtered dataset)
-- **Auto-Refresh**
-  - Automatic refresh every `REFRESH_SECONDS` (default: 30s)
-  - Manual **Refresh** button that busts Streamlit caches
-- **Custom Styling**
-  - Background and UI enhancements via `frontend/`
+### Student Evaluation filters
+
+- Filter by **College**, **Department**, and **Year**
+- Supports **custom text inputs** (exact value normalization + contains-based matching)
+- **Clear All Filters** button
+- Shows a **filter summary** and a “no results” warning when nothing matches
+
+### Normalization
+
+- Canonical normalization for spelling variants of:
+  - `college_name`
+  - `department`
+- Implemented via canonical maps in `filters/college_dept_map.py` and applied during data fetch.
+
+### Visualizations & analytics
+
+Student Evaluation view provides rich Plotly charts and score analytics when available, including:
+
+- Sunburst (College → Department → Year)
+- Pie charts (e.g., medium, career goal)
+- Grouped bar charts (career goals vs prep-test)
+- Stacked bar (learning seek-answer profile)
+- Bubble chart (teaching style fit)
+- Donuts (content vs engagement)
+- Score analytics (only when score columns like `final_score` are present)
+
+### KPIs
+
+When `final_score` exists after filtering, KPIs include:
+
+- Total Students
+- Average score metrics (Quant/Logic/Verbal/Final)
+- Tier counts (e.g., `final_score >= 75`, `final_score >= 45`)
+- #1 performer (top final score)
+
+### Student table + export
+
+- Student data table with selection/filtering
+- **Filter by Student ID** (if `student_id` column exists)
+- **Export CSV** of the filtered dataset
+
+### Auto-refresh
+
+- The dashboard refreshes every `REFRESH_SECONDS` (default: **30s**)
+- Includes a manual **Refresh** button that clears caches and triggers a rerun
+
+### Custom styling
+
+- Styling and custom HTML/JS are loaded from `frontend/`
 
 ---
 
 ## Tech Stack
 
-| Category        | Technology                                                 |
-| --------------- | ---------------------------------------------------------- |
-| Frontend        | [Streamlit](https://streamlit.io/)                         |
-| Data Processing | [Pandas](https://pandas.pydata.org/)                       |
-| Visualizations  | [Plotly](https://plotly.com/python/)                       |
-| Data Source     | Supabase (default) / Local CSV (optional)                  |
-| API Integration | Supabase REST (no external supabase SDK)                   |
-| Authentication  | Supabase JWT via env vars (`SUPABASE_URL`, `SUPABASE_KEY`) |
+| Category        | Technology                                                               |
+| --------------- | ------------------------------------------------------------------------ |
+| Frontend / UI   | Streamlit                                                                |
+| Data processing | Pandas                                                                   |
+| Visualizations  | Plotly (Plotly Express)                                                  |
+| Data source     | Supabase (default) or Local CSV (optional)                               |
+| Supabase access | Supabase REST API via a minimal custom client (no external supabase SDK) |
+| Authentication  | Supabase JWT via env vars `SUPABASE_URL`, `SUPABASE_KEY`                 |
 
 ---
 
-## Project Structure
+## Repository Layout
 
 ```
 Dashboard-Placed/
 ├── app.py
 ├── constants.py
-├── filter.py
-├── student_dashboard.py
-├── db_queries.py
-├── supabase_client.py
-├── college_dept_map.py
-├── questionnaire_instruct_map.py
-├── wake.py
-├── requirements.txt
 ├── deployment.yaml
 ├── Dockerfile
-├── .dockerignore
-├── .gitignore
-├── convert_logo_to_base64.py
+├── requirements.txt
+├── services.yaml
+├── wake.py
+├── README.md
 ├── data/
 │   ├── __init__.py
-│   └── data.py
-├── data/backups/
-│   ├── BACKUPS.md
-│   ├── CLASSIFICATION.csv
-│   └── STUDENT_DATA.csv
-├── frontend/
+│   ├── data.py
+│   └── backups/
+│       ├── BACKUPS.md
+│       ├── CLASSIFICATION.csv
+│       └── STUDENT_DATA.csv
+├── filters/
 │   ├── __init__.py
-│   ├── Dockerfile
-│   ├── .dockerignore
-│   ├── nginx.conf
-│   ├── bg.py
-│   ├── bg.css
-│   ├── dashboard.css
-│   ├── dashboard.html
-│   ├── filter_styles.css
-│   ├── index.html
-│   ├── dashboard.css
-│   ├── profiling.css
-│   ├── profiling.html
-│   ├── profiling.js
-│   ├── script.js
-│   ├── styles.css
-│   ├── styles.py
-│   ├── template.html
-│   └── countdown.html
+│   ├── filter.py              # main filter + normalization + score analytics + export
+│   ├── student_dashboard.py   # Student Evaluation tab rendering
+│   ├── college_dept_map.py    # canonical spelling maps
+│   └── questionnaire_instruct_map.py
 ├── form/
 │   ├── __init__.py
-│   ├── Dockerfile
-│   ├── .dockerignore
-│   ├── form.py
-│   ├── schema.py
-│   ├── sync.py
-│   ├── backup.py
-│   ├── student_data.py
-│   ├── classification.py
-│   ├── marking.py
-│   └── requirements.txt
-├── Resources/
-│   ├── Placed.jpg
-│   ├── Placed_base64.txt
-│   └── LOGO.png
-│   └── Profiling questionnaire.docx
-└── ...
+│   ├── sync.py                # one-time CSV → Supabase sync utilities
+│   └── backup.py
+├── frontend/
+│   ├── styles.py
+│   ├── script.js
+│   ├── countdown.html
+│   ├── css/
+│   └── js/
+├── queries/
+│   ├── db_queries.py         # fetch/insert with Streamlit caching
+│   └── supabase_client.py    # minimal REST client
+└── Resources/
+    ├── Dashboard.png
+    ├── Dashboard2.png
+    ├── Drawer.png
+    ├── LOGO.png
+    ├── Placed.jpg
+    └── Profiling questionnaire.docx
 ```
+
+---
 
 ## Containerization & Deployment (Docker + Kubernetes)
 
-The repo includes Dockerfiles for the main Streamlit app and for the `frontend/` and `form/` services, plus a Kubernetes manifest for deployment.
+The repo supports containerization for the dashboard and related services.
 
-### Docker (local)
+### Docker
 
-From the repository root:
-
-- Main Streamlit container:
-  - `Dockerfile`
-- Nginx/static frontend container:
-  - `frontend/Dockerfile`
-- Form/collection container:
-  - `form/Dockerfile`
-
-Example build commands (adjust image names as needed):
+Build images from the repository root:
 
 ```bash
 docker build -t dashboard-placed:latest .
 docker build -t dashboard-placed-frontend:latest ./frontend
-docker build -t dashboard-placed-form:latest .
+docker build -t dashboard-placed-form:latest ./form
 ```
 
-### Kubernetes (pods + deployment)
+### Kubernetes
 
-- Kubernetes resources are defined in `deployment.yaml`.
-- Each service typically runs as a **Deployment** controlling one or more **Pods**.
-- Pods contain one container (or multiple, depending on the manifest) for:
-  - the Streamlit dashboard
-  - the frontend (often served by Nginx)
-  - the form/ingestion service
-
-Typical Kubernetes concepts referenced by this setup:
-
-- **Pod**: smallest deployable unit (runs your container(s))
-- **Deployment**: ensures desired replica count and supports rolling updates
-- **Service**: provides stable networking between components
-- **Ingress** (if configured in the manifest): routes external traffic to services
-
-### Notes / Prerequisites
-
-- Ensure Supabase credentials (`SUPABASE_URL`, `SUPABASE_KEY`) are provided to the relevant containers (env vars or Kubernetes Secrets).
-- Confirm that the services expose the expected ports (Streamlit defaults to `8501`; Nginx uses its configured port).
+Kubernetes resources are defined in `deployment.yaml` (and related manifests such as `services.yaml`).
 
 ---
 
@@ -184,7 +165,9 @@ Typical Kubernetes concepts referenced by this setup:
 
 - Python 3.8+
 - Supabase project (default data source)
-- Environment variables: `SUPABASE_URL`, `SUPABASE_KEY`
+- Environment variables:
+  - `SUPABASE_URL`
+  - `SUPABASE_KEY`
 
 Local CSV testing is supported via `USE_CSV = True` in `constants.py`.
 
@@ -224,28 +207,25 @@ Local URL: `http://localhost:8501`
 
 ---
 
-## Dashboard Views
+## How Data Flows
 
-### 1) Response Dashboard
-
-- Intended for aggregated/classification insights.
-- Uses the dataset from `SUPA_DB` (`CLASSIFICATION`) or the local CSV classification file when `USE_CSV=True`.
-
-### 2) Student Evaluation Dashboard
-
-- Student-level questionnaire analytics.
-- Uses the raw dataset from `SUPA_RAW_DB` (`STUDENT_DATA`) or the local student CSV.
-- Supports College/Department/Year filters + custom text filters.
-- Displays learning-profile charts and engagement/commitment visualizations.
-- Shows a cleaned **Student Responses** table and supports **Export CSV**.
+1. **Startup**: `frontend/styles.py` loads CSS/HTML/JS and configures the Streamlit page.
+2. **Mode selection**: `app.py` chooses the view:
+   - `Response Dashboard` → `view="classification"`
+   - `Student Evaluation Dashboard` → `view="raw"`
+3. **Data loading**: `data/data.py:load_data(view=...)`
+   - If `USE_CSV=True`, reads from `data/backups/*.csv`
+   - Otherwise loads from Supabase via `queries/db_queries.py`
+4. **Normalization**: applied in fetch functions (cached) using canonical maps.
+5. **Filtering + export**: `filters/filter.py` renders filters, KPIs, analytics, and exports.
 
 ---
 
-## Expected Data Columns
+## Expected Columns
 
-The app consumes different subsets of columns depending on which view is active.
+The dashboard expects different fields depending on which dataset is loaded.
 
-### Student Evaluation (raw `STUDENT_DATA`) expects (examples)
+### Student Evaluation (raw `STUDENT_DATA`) includes (examples)
 
 - Identity / grouping:
   - `student_id`, `student_name`
@@ -254,27 +234,35 @@ The app consumes different subsets of columns depending on which view is active.
 - Placement/goal:
   - `career_goal`
   - `have_prep_test`
-- Learning profile / questionnaire fields (examples used by charts):
+- Questionnaire fields (examples used by charts):
   - `learn_Q1`
-  - `instruct_Q1`, `instruct_Q2`, `instruct_Q3`, `instruct_Q4`, `instruct_Q5`, `instruct_Q6`
-  - `content_pref_Q1`, `engage_Q1`, `engage_Q3`, `engage_Q4`
+  - `instruct_Q1` … `instruct_Q6`
+  - `content_pref_Q1`
+  - `engage_Q1`, `engage_Q3`, `engage_Q4`
   - `commit_Q2`, `commit_Q4`
-- Score analytics (if present):
+- Score analytics (if available):
   - `quant_score`, `logic_score`, `verbal_score`, `final_score`
 
 ### Response / Classification dataset (`CLASSIFICATION`)
 
-The Response Dashboard is based on the classification table. Column expectations depend on your stored aggregation logic.
+The Response Dashboard is driven by the classification table. Column names depend on how the classification rows were created.
 
 ---
 
-## How Auto-Refresh Works
+## Auto-Refresh + Manual Refresh
 
-- The app calls `auto_refresh()` from `frontend/styles.py`.
-- `app.py` shows a **Refresh** button that:
-  1. Clears `st.cache_data`
-  2. Removes cached DataFrames from `st.session_state`
-  3. Re-runs the app
+- `app.py` shows a **Refresh** button that clears Streamlit caches (`st.cache_data.clear()`) and removes cached DataFrames from `st.session_state`.
+- `frontend/styles.py:auto_refresh()` displays a countdown UI.
+
+---
+
+## One-time Supabase Sync Utilities (form/)
+
+The `form/` folder contains helpers for syncing CSVs into Supabase (typically used once to populate tables):
+
+- `form/sync.py`
+  - `sync_STUDENT_csv_to_supabase()` → pushes `./data/STUDENTS - Sheet1.csv` into `STUDENT_DATA`
+  - `sync_CLASS_csv_to_supabase()` → pushes `./data/CLASSIFICATIONS - Sheet1 (1).csv` into `CLASSIFICATION`
 
 ---
 
@@ -282,28 +270,28 @@ The Response Dashboard is based on the classification table. Column expectations
 
 ### Supabase authentication errors
 
-- Ensure `SUPABASE_URL` and `SUPABASE_KEY` are correct.
-- Verify table permissions for `CLASSIFICATION` and `STUDENT_DATA`.
+- Verify `SUPABASE_URL` and `SUPABASE_KEY` are correct.
+- Ensure the Supabase table permissions allow SELECT/INSERT for the configured key.
 
-### Data not loading / charts missing
+### Charts missing / data not loading
 
-- The Student Evaluation view shows informational messages when expected columns are missing (e.g., `learn_Q1`, `instruct_Q1`).
+- The Student Evaluation view shows informational messages when expected questionnaire/score columns are missing.
 - Confirm your dataset column names match what the dashboard references.
 
 ### Auto-refresh issues
 
-- Some browser environments restrict background refresh.
-- Use the manual **Refresh** button in the app.
+- Some browsers restrict background updates.
+- Use the manual **Refresh** button.
 
 ---
 
 ## License
 
-MIT License. See `LICENSE` file for details.
+MIT License. See `LICENSE` for details.
 
 ---
 
 ## Acknowledgments
 
-- [Streamlit](https://streamlit.io/)
-- [Plotly](https://plotly.com/python/)
+- Streamlit
+- Plotly
