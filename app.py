@@ -22,7 +22,7 @@ with col_refresh[1]:
         for _key in ["df_raw", "df_classification"]:
             st.session_state.pop(_key, None)
         st.rerun()
- 
+
 auto_refresh()
  
 st.caption(f"Auto-refresh every {REFRESH_SECONDS} seconds | Last updated: {datetime.now().strftime('%H:%M:%S')}")
