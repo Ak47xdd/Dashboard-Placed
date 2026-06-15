@@ -17,3 +17,5 @@ CSV_FILE = "CLASSIFICATIONS - Sheet1 (1).csv"
 # Table schema provided by supabase: public."CLASSIFICATION" & public."STUDENT_DATA"
 SUPA_DB = "CLASSIFICATION"
 SUPA_RAW_DB = "STUDENT_DATA"
+
+# Other constants (if any)
