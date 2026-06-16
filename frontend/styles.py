@@ -71,3 +71,4 @@ def auto_refresh():
         st.markdown(countdown_content, unsafe_allow_html=True)
     except FileNotFoundError:
         pass
+        
