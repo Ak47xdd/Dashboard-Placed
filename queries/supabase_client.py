@@ -10,7 +10,7 @@ Please update the .env file with necessary credentials :
 """
 
 from __future__ import annotations
- 
+
 from functools import lru_cache
 from typing import Any
  
