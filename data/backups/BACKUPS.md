@@ -25,7 +25,7 @@ This script fetches all rows from both tables via Supabase REST and writes CSV f
 
 Perform a backup:
 
-- **Every month**, _or_
+- **Every month** (recommended), _or_
 - **Every 6 months** (if that better matches your operational needs)
 
 Pick one cadence and stick to it.
