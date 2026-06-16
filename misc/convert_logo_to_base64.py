@@ -50,7 +50,7 @@ def main():
     
     input_path = os.path.join(script_dir, 'Resources', input_file())
     output_path = os.path.join(script_dir, 'Resources', output_file())
-
+    
     convert_png_to_base64(input_path, output_path)
 
 if __name__ == '__main__':
