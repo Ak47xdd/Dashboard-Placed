@@ -10,7 +10,7 @@ import streamlit as st
  
 from constants import SUPA_DB, SUPA_RAW_DB
 from queries.supabase_client import get_supabase
- 
+
 def _normalize(df: pd.DataFrame) -> pd.DataFrame:
     """
     Normalize college_name and department spelling variants using canonical maps.
