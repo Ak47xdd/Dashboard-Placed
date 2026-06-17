@@ -24,7 +24,6 @@ def test_sync_STUDENT_csv_to_supabase_posts_to_correct_endpoint_and_headers(tmp_
         # Act
         sync_mod.sync_STUDENT_csv_to_supabase()
 
-        # Assert
         mock_read_csv.assert_called_once()
 
         expected_endpoint = "https://example.supabase.co/rest/v1/STUDENT_DATA"
