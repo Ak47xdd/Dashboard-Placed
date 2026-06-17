@@ -5,7 +5,7 @@ import pandas as pd
 
 import form.sync as sync_mod
 
-
+# Test if the sync fuction for STUDENT_DATA works
 def test_sync_STUDENT_csv_to_supabase_posts_to_correct_endpoint_and_headers(tmp_path):
     sample_df = pd.DataFrame({
         "student_id": ["S1", "S2"],
@@ -42,7 +42,7 @@ def test_sync_STUDENT_csv_to_supabase_posts_to_correct_endpoint_and_headers(tmp_
         assert isinstance(payload, list)
         assert payload == sample_df.to_dict(orient="records")
 
-
+# Test if the sync fuction for CLASSIFICATION works
 def test_sync_CLASS_csv_to_supabase_handles_non_200_201_status():
     sample_df = pd.DataFrame({"student_id": ["S1"], "program": ["P1"]})
 
