@@ -59,7 +59,7 @@ class _FakeSupabaseClient:
     def table(self, table: str) -> _FakeTable:
         return _FakeTable(table, client=self)
 
-
+# Test student entry to CLASSIFICATION table
 def test_append_student_entry_omits_blank_student_id_and_inserts_into_classification():
     fake_client = _FakeSupabaseClient(
         insert_result_rows=[{"student_id": "DB_GENERATED_ID"}],
@@ -89,7 +89,7 @@ def test_append_student_entry_omits_blank_student_id_and_inserts_into_classifica
     assert sent_payload["college_name"] == "Christ College Vizhinjam"
     assert sent_payload["department"] == "BCA"
 
-
+# Test student entry with None student_id to CLASSIFICATION table
 def test_append_student_entry_omits_none_student_id():
     fake_client = _FakeSupabaseClient(insert_result_rows=[{"student_id": "X1"}])
 
