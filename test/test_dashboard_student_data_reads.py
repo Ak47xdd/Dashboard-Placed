@@ -103,7 +103,7 @@ def test_fetch_student_raw_df_reads_student_data_and_normalizes():
     assert df.loc[df["student_id"] == "S2", "college_name"].iloc[0] == "Amrita Vishwa Vidyapeetham Mysore"
     assert df.loc[df["student_id"] == "S2", "department"].iloc[0] == "BCA + MCA"
 
-
+# Test empty table fetch from STUDENT_DATA
 def test_fetch_student_raw_df_empty_table_returns_empty_df():
     fake_client = _FakeSupabaseClient(read_data_by_table={"STUDENT_DATA": []})
 
