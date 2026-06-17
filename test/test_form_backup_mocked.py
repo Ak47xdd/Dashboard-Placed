@@ -30,7 +30,7 @@ def test_backup_data_calls_two_endpoints_and_writes_csvs(tmp_path, monkeypatch):
 
         assert mock_to_csv.call_count == 2
 
-
+# Test if errors from the endpoints are handled and do not write csvs
 def test_backup_data_does_not_write_csv_on_non_200():
     students_res = MagicMock(status_code=500, text="oops", json=lambda: [])
     class_res = MagicMock(status_code=200, json=lambda: [{"student_id": "S1"}])
