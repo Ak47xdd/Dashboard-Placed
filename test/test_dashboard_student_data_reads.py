@@ -61,7 +61,7 @@ class _FakeSupabaseClient:
     def table(self, table: str) -> _FakeTable:
         return _FakeTable(table, client=self)
 
-
+# Test fake student read at STUDENT_DATA
 def test_fetch_student_raw_df_reads_student_data_and_normalizes():
     fake_rows = [
         {
@@ -82,7 +82,6 @@ def test_fetch_student_raw_df_reads_student_data_and_normalizes():
         read_data_by_table={"STUDENT_DATA": fake_rows},
     )
 
-    # streamlit cache may retain previous test results
     try:
         dbq.fetch_student_raw_df.clear()
     except Exception:
