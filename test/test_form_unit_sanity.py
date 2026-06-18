@@ -1,5 +1,6 @@
 import pandas as pd
 
+# Test sanity of the dataframe fixture used for filters in the form unit
 def test_dataframe_fixture_shape_for_filters_is_ok():
     df = pd.DataFrame(
         [
