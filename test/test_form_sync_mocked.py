@@ -1,6 +1,7 @@
 import os
 from unittest.mock import MagicMock, patch
 import pandas as pd
+
 import form.sync as sync_mod
 
 # Test if the sync fuction for STUDENT_DATA works
@@ -11,7 +12,7 @@ def test_sync_STUDENT_csv_to_supabase_posts_to_correct_endpoint_and_headers(tmp_
         "department": ["X", "Y"],
     })
 
-    with patch.object(sync_mod, "SUPABASE_URL", "https://example.supabase.co"), patch.object(
+    with patch.object(sync_mod, "SUPABASE_URL", "https://bzvztzxrrziqrfokcyuf.supabase.co"), patch.object(
         sync_mod, "SUPABASE_KEY", "service-key"
     ), patch.object(sync_mod.pd, "read_csv", return_value=sample_df) as mock_read_csv, patch.object(
         sync_mod.requests, "post"
@@ -24,7 +25,7 @@ def test_sync_STUDENT_csv_to_supabase_posts_to_correct_endpoint_and_headers(tmp_
 
         mock_read_csv.assert_called_once()
 
-        expected_endpoint = "https://example.supabase.co/rest/v1/STUDENT_DATA"
+        expected_endpoint = "https://bzvztzxrrziqrfokcyuf.supabase.co/rest/v1/STUDENT_DATA"
         assert mock_post.call_count == 1
         called_endpoint = mock_post.call_args[0][0]
         assert called_endpoint == expected_endpoint
@@ -43,7 +44,7 @@ def test_sync_STUDENT_csv_to_supabase_posts_to_correct_endpoint_and_headers(tmp_
 def test_sync_CLASS_csv_to_supabase_handles_non_200_201_status():
     sample_df = pd.DataFrame({"student_id": ["S1"], "program": ["P1"]})
 
-    with patch.object(sync_mod, "SUPABASE_URL", "https://example.supabase.co"), patch.object(
+    with patch.object(sync_mod, "SUPABASE_URL", "https://bzvztzxrrziqrfokcyuf.supabase.co"), patch.object(
         sync_mod, "SUPABASE_KEY", "service-key"
     ), patch.object(sync_mod.pd, "read_csv", return_value=sample_df), patch.object(
         sync_mod.requests, "post"
@@ -52,6 +53,6 @@ def test_sync_CLASS_csv_to_supabase_handles_non_200_201_status():
 
         sync_mod.sync_CLASS_csv_to_supabase()
 
-        expected_endpoint = "https://example.supabase.co/rest/v1/CLASSIFICATION"
+        expected_endpoint = "https://bzvztzxrrziqrfokcyuf.supabase.co/rest/v1/CLASSIFICATION"
         assert mock_post.call_args[0][0] == expected_endpoint
 
