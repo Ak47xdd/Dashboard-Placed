@@ -104,7 +104,7 @@ def test_fetch_classification_df_reads_classification_and_normalizes():
     assert df.loc[df["student_id"] == "C2", "college_name"].iloc[0] == "Christ College Vizhinjam"
     assert df.loc[df["student_id"] == "C2", "department"].iloc[0] == "BCA"
 
-
+# Test that an empty CLASSIFICATION table returns an empty DataFrame
 def test_fetch_classification_df_empty_table_returns_empty_df():
     fake_client = _FakeSupabaseClient(read_data_by_table={"CLASSIFICATION": []})
 
