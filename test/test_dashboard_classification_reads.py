@@ -60,7 +60,7 @@ class _FakeSupabaseClient:
     def table(self, table: str) -> _FakeTable:
         return _FakeTable(table, client=self)
 
-
+# Test cases for fetch_classification_df for read and marking
 def test_fetch_classification_df_reads_classification_and_normalizes():
     fake_rows = [
         {
