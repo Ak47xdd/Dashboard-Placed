@@ -2,7 +2,6 @@ import os
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-
 import form.sync as sync_mod
 
 # Test if the sync fuction for STUDENT_DATA works
