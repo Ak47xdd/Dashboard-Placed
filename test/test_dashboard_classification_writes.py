@@ -41,7 +41,6 @@ class _FakeTable:
         self._client.insert_calls.append((self._table_name, dict(self._insert_payload)))
         return _FakeResponse(data=list(self._client.insert_result_rows))
 
-
 class _FakeSupabaseClient:
     def __init__(
         self,
