@@ -34,7 +34,6 @@ class _FakeTable:
         return self
 
     def execute(self) -> _FakeResponse:
-        # Read path
         if self._insert_payload is None:
             self._client.select_calls.append((self._table_name, self._select_called))
             rows = self._client.read_data_by_table.get(self._table_name, [])
