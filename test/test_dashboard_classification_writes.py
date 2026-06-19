@@ -13,7 +13,6 @@ import queries.db_queries as dbq
 class _FakeResponse:
     data: List[Dict[str, Any]]
 
-
 class _FakeTable:
     def __init__(
         self,
