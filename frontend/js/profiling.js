@@ -1,6 +1,6 @@
 /**
  * profiling.js
- * Form submission via Supabase JS SDK — no FastAPI server involved.
+ * Form submission via Supabase JS SDK.
  */
  
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
