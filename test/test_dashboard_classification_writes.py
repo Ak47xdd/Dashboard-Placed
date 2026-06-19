@@ -40,7 +40,6 @@ class _FakeTable:
             rows = self._client.read_data_by_table.get(self._table_name, [])
             return _FakeResponse(data=list(rows))
 
-        # Insert path
         self._client.insert_calls.append((self._table_name, dict(self._insert_payload)))
         return _FakeResponse(data=list(self._client.insert_result_rows))
 
