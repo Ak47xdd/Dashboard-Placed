@@ -108,4 +108,3 @@ def test_append_student_entry_omits_none_student_id():
     sent_payload = fake_client.insert_calls[0][1]
     assert "student_id" not in sent_payload
     assert sent_payload["college_name"] == "Amrita Vishwa Vidyapeetham Mysore"
-
