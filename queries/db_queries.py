@@ -14,7 +14,7 @@ from queries.supabase_client import get_supabase
 def _normalize(df: pd.DataFrame) -> pd.DataFrame:
     """
     Normalize college_name and department spelling variants using canonical maps.
-    Called once at fetch time so the result is cached with the data — never runs
+    Called once at fetch time so the result is cached with the data, never runs
     again until the cache expires.
     """
     
@@ -79,7 +79,6 @@ def append_student_entry(data_dict: dict[str, Any]) -> int | None:
  
     payload = dict(data_dict)
  
-    # If student_id is missing/blank, let DB generate it.
     if "student_id" in payload and payload["student_id"] in (None, ""):
         payload.pop("student_id")
  
