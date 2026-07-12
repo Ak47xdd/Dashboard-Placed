@@ -1,3 +1,8 @@
+# Build By Akshay Babu, AI & Product Intern, PLACED (https://www.linkedin.com/in/akshay-babu-827b85370/)
+# Maintanance Logs :
+# 1) Akshay Babu : May, 2026 - June, 2026
+# 2) 
+
 """
 Main Streamlit app entry point. Responsible for loading styles, data, 
 and rendering the appropriate dashboard based on user selection.
